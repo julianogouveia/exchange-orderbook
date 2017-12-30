@@ -2,9 +2,11 @@ import uuid
 from decimal import Decimal
 
 from django.db import models
+from django.db.models.signals import post_save
 from django.contrib import admin
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import UserManager
+from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel, StatusModel
 from model_utils import Choices
@@ -14,7 +16,7 @@ class Users(TimeStampedModel, AbstractUser):
     STATUS = Choices('created')
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    sponsor = models.ForeignKey('self', null=True, blank=True, verbose_name=_("Sponsor"))
+    sponsor = models.ForeignKey('self', null=True, blank=True, verbose_name=_("Sponsor"), on_delete=models.CASCADE)
     status = models.CharField(max_length=30, default=STATUS.created, verbose_name=_("Status"))
 
     objects = UserManager()
@@ -39,8 +41,8 @@ class Currencies(TimeStampedModel, models.Model):
 
 
 class Accounts(TimeStampedModel, models.Model):
-    currency = models.ForeignKey(Currencies, related_name='accounts')
-    user = models.ForeignKey('users.User', related_name='accounts', null=True)
+    currency = models.ForeignKey(Currencies, related_name='accounts', verbose_name=_("Currency"), on_delete=models.CASCADE)
+    user = models.ForeignKey(Users, related_name='accounts', null=True, verbose_name=_("User"), on_delete=models.CASCADE)
     deposit = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
     reserved = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
     deposit_address = models.CharField(max_length=255, null=True, blank=True)

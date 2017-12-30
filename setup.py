@@ -11,7 +11,7 @@ setup(
 	author='Juliano Gouveia',
 	author_email='juliano@neosacode.com',
 	keywords='exchange, neosacode, coins',
-	install_requires=['django>=2.0', 'django-model-utils'],
+	install_requires=['django>=2.0', 'django-model-utils', 'Pillow'],
 	packages=find_packages(exclude=[]),
 	python_requires='>=3.5'
 )
