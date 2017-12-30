@@ -1,7 +1,7 @@
 import uuid
 from decimal import Decimal
 
-from django.db import models
+from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.contrib import admin
 from django.contrib.auth.models import AbstractUser
