@@ -12,6 +12,11 @@ REQUIREMENTS = [
 	'prettyconf', 
 	'psycopg2',
 	'django-extensions',
+	'django-tweaks==0.1.1',
+]
+
+DEPENDENCIES = [
+	'https://github.com/jazzband/django-widget-tweaks/tarball/master#egg=django-tweaks-0.1.1',
 ]
 
 setup(
@@ -22,6 +27,7 @@ setup(
 	author_email='juliano@neosacode.com',
 	keywords='exchange, neosacode, coins',
 	install_requires=REQUIREMENTS,
+	dependency_links=DEPENDENCIES,
 	packages=find_packages(exclude=[]),
 	python_requires='>=3.5'
 )
