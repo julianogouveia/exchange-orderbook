@@ -23,7 +23,7 @@ class WalletsView(TemplateView):
 		'currency__name',
 		'currency__symbol',
 		'deposit',
-		'reserved'
+		'reserved',
 	]
 
 	def get(self, request):
