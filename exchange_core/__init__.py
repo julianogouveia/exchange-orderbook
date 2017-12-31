@@ -44,6 +44,3 @@ settings.AUTH_USER_MODEL = PACKAGE_NAME + '.Users'
 
 # Define o template do Two Factor para ser usado no login
 settings.LOGIN_URL = 'two_factor:login'
-
-# Define o tempo máximo de inatividade para 15 minutos
-settings.SESSION_COOKIE_AGE = 15 * 60
