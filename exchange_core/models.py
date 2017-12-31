@@ -65,6 +65,8 @@ class Accounts(TimeStampedModel, models.Model):
 @receiver(post_save, sender=Users, dispatch_uid='create_user_accounts')
 def create_user_accounts(sender, instance, created, **kwargs):
     if created:
+        currencies = Currencies.objects.all()
+        
         with transaction.atomic():
             for currency in currencies:
                 account = Accounts()
@@ -77,7 +79,7 @@ def create_user_accounts(sender, instance, created, **kwargs):
 def create_currency_user_accounts(sender, instance, created, **kwargs):
     with transaction.atomic():
         # Filtra pelos usuários que ainda não tem essa conta
-        users = User.objects.exclude(accounts__currency__pk=instance.pk)
+        users = Users.objects.exclude(accounts__currency=instance)
 
         for user in users:
             account = Accounts()
