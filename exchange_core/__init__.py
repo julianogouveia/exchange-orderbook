@@ -66,7 +66,6 @@ settings.LOGIN_REDIRECT_URL = reverse_lazy('core>wallets')
 # Adiciona o contexto do pacote django-session-security para os templates
 settings.TEMPLATES[0]['OPTIONS']['context_processors'] += [
     'account.context_processors.account',
-    'django.core.context_processors.request',
 ]
 
 # Define o ID do site
