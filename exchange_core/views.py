@@ -1,8 +1,10 @@
 from django.views.generic.edit import FormView
-from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 from django.shortcuts import render
+from account.decorators import login_required
+
+import account.views
 
 from . import forms
 from .models import Accounts
@@ -29,3 +31,8 @@ class WalletsView(TemplateView):
 	def get(self, request):
 		wallets = Accounts.objects.filter(user=request.user).values(*self.fields)
 		return render(request, self.template_name, {'wallets': list(wallets)})
+
+
+class SignupView(account.views.SignupView):
+   form_class = forms.SignupForm
+       

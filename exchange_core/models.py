@@ -12,10 +12,13 @@ from model_utils.models import TimeStampedModel, StatusModel
 from model_utils import Choices
 
 
-class Users(TimeStampedModel, AbstractUser):
+class BaseModel(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+
+class Users(TimeStampedModel, AbstractUser, BaseModel):
     STATUS = Choices('created')
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sponsor = models.ForeignKey('self', null=True, blank=True, verbose_name=_("Sponsor"), on_delete=models.CASCADE)
     status = models.CharField(max_length=30, default=STATUS.created, verbose_name=_("Status"))
 
@@ -26,7 +29,7 @@ class Users(TimeStampedModel, AbstractUser):
         verbose_name_plural = _("Users")
 
 
-class Currencies(TimeStampedModel, models.Model):
+class Currencies(TimeStampedModel, BaseModel):
     name = models.CharField(max_length=100)
     symbol = models.CharField(max_length=10)
     icon = models.ImageField(null=True, blank=True, verbose_name=_("Icon"))
@@ -40,7 +43,7 @@ class Currencies(TimeStampedModel, models.Model):
         return self.name
 
 
-class Accounts(TimeStampedModel, models.Model):
+class Accounts(TimeStampedModel, BaseModel):
     currency = models.ForeignKey(Currencies, related_name='accounts', verbose_name=_("Currency"), on_delete=models.CASCADE)
     user = models.ForeignKey(Users, related_name='accounts', null=True, verbose_name=_("User"), on_delete=models.CASCADE)
     deposit = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
@@ -49,8 +52,8 @@ class Accounts(TimeStampedModel, models.Model):
     withdraw_address = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
-        verbose_name = 'Account'
-        verbose_name_plural = 'Accounts'
+        verbose_name = 'Currency Account'
+        verbose_name_plural = 'Currencies Accounts'
         ordering = ['currency__name']
 
     def __str__(self):

@@ -1,5 +1,8 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
+from django import forms
+
+import account.forms
 
 from .models import Users
 
@@ -17,3 +20,7 @@ class ForgetPasswordForm(forms.Form):
 			raise forms.ValidationError(_("The e-mails are not equal"))
 		
 		return repeat_email
+
+
+class SignupForm(account.forms.SignupForm):
+    field_order = ['username', 'email', 'password', 'password_confirm', 'code']
