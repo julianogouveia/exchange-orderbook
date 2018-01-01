@@ -13,7 +13,6 @@ REQUIREMENTS = [
 	'psycopg2',
 	'django-extensions',
 	'django-user-accounts',
-	'django-bootstrap-form',
 	'django-anymail',
 	'django-widget-tweaks==0.0.0.1.1',
 	'django-session-security==0.0.0.1.1',

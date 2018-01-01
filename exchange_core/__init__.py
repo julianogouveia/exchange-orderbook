@@ -28,7 +28,6 @@ default_app_config = PACKAGE_NAME + '.apps.Config'
 # Adiciona https://github.com/Bouke/django-two-factor-auth
 # Adiciona https://github.com/django-extensions/django-extensions
 # Adiciona https://github.com/jazzband/django-widget-tweaks
-# Adiciona https://django-bootstrap-form.readthedocs.io/en/latest/
 # Adiciona https://github.com/pinax/django-user-accounts
 # Adiciona https://github.com/anymail/django-anymail
 # Adiciona https://github.com/yourlabs/django-session-security/
@@ -41,7 +40,6 @@ settings.INSTALLED_APPS += [
     'two_factor',
     'django_extensions',
     'widget_tweaks',
-    'bootstrapform',
     'account',
     'anymail',
     'session_security',
