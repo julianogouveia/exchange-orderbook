@@ -88,5 +88,5 @@ settings.EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
 
 # Django session security configurações
 settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-settings.EXPIRE_AFTER = config('EXPIRE_AFTER') # Define o tempo de inatividade máximo do usuário, caso ele ultrapasse esse tempo, ele deverá fazer login novamente
-settings.WARN_AFTER = config('WARN_AFTER')
+settings.SESSION_SECURITY_EXPIRE_AFTER = config('SESSION_SECURITY_EXPIRE_AFTER') # Define o tempo de inatividade máximo do usuário, caso ele ultrapasse esse tempo, ele deverá fazer login novamente
+settings.SESSION_SECURITY_WARN_AFTER = config('SESSION_SECURITY_WARN_AFTER')
