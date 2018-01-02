@@ -4,6 +4,7 @@ from uuid import UUID
 
 from django.conf import settings
 from django.urls import reverse_lazy
+from django.contrib import messages
 from prettyconf.configuration import Configuration
 
 # Diz ao pretty conf o path do .env caso não existam variáveis de ambiente para a respectiva config
@@ -76,6 +77,7 @@ settings.SITE_ID = 1
 settings.ACCOUNT_LOGIN_URL = 'two_factor:login'
 settings.ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = 'two_factor:login'
 settings.ACCOUNT_PASSWORD_RESET_REDIRECT_URL = 'two_factor:login'
+settings.ACCOUNT_SETTINGS_REDIRECT_URL = 'core>settings'
 settings.ACCOUNT_EMAIL_UNIQUE = True
 settings.ACCOUNT_EMAIL_CONFIRMATION_REQUIRED = True
 settings.ACCOUNT_EMAIL_CONFIRMATION_URL = 'core>email-confirm'
@@ -98,3 +100,12 @@ settings.SESSION_SECURITY_WARN_AFTER = config('SESSION_SECURITY_WARN_AFTER', cas
 
 # Django passwords configurações
 settings.PASSWORD_MIN_LENGTH = 8
+
+# Django messages configurações / Alertas do bootstrap
+settings.MESSAGE_TAGS = {
+    messages.DEBUG: 'alert-info',
+    messages.INFO: 'alert-info',
+    messages.SUCCESS: 'alert-success',
+    messages.WARNING: 'alert-warning',
+    messages.ERROR: 'alert-danger',
+}
