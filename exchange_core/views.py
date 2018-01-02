@@ -7,7 +7,7 @@ from account.decorators import login_required
 import account.views
 
 from . import forms
-from .models import Accounts
+from .models import Users, Accounts
 
 
 class ForgetPasswordView(FormView):
@@ -34,5 +34,11 @@ class WalletsView(TemplateView):
 
 
 class SignupView(account.views.SignupView):
-   form_class = forms.SignupForm
-       
+	form_class = forms.SignupForm
+
+	# Sobreescreve o metodo after_signup para popular campos adicionais do usuário
+	def after_signup(self, form):
+		user = self.created_user
+		user.first_name = form.cleaned_data['first_name']
+		user.last_name = form.cleaned_data['last_name']
+		user.save()

@@ -25,13 +25,14 @@ PACKAGE_NAME = 'exchange_core'
 # Diz ao Django aonde está a configuração desse modulo
 default_app_config = PACKAGE_NAME + '.apps.Config'
 
-# Adiciona https://github.com/Bouke/django-two-factor-auth
-# Adiciona https://github.com/django-extensions/django-extensions
-# Adiciona https://github.com/jazzband/django-widget-tweaks
-# Adiciona https://github.com/pinax/django-user-accounts
-# Adiciona https://github.com/anymail/django-anymail
-# Adiciona https://github.com/yourlabs/django-session-security/
-# O modulo django.contrib.sites é necessário para o django-user-accounts
+# https://github.com/Bouke/django-two-factor-auth
+# https://github.com/django-extensions/django-extensions
+# https://github.com/jazzband/django-widget-tweaks
+# https://github.com/pinax/django-user-accounts
+# https://github.com/dstufft/django-passwords
+# https://github.com/anymail/django-anymail
+# https://github.com/yourlabs/django-session-security/
+# django.contrib.sites é requerido pelo django-user-accounts
 settings.INSTALLED_APPS += [
     'django.contrib.sites', 
 	'django_otp',
@@ -72,6 +73,11 @@ settings.TEMPLATES[0]['OPTIONS']['context_processors'] += [
 settings.SITE_ID = 1
 
 # Django user accounts configurações
+settings.ACCOUNT_LOGIN_URL = 'two_factor:login'
+settings.ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = 'two_factor:login'
+settings.ACCOUNT_PASSWORD_RESET_REDIRECT_URL = 'two_factor:login'
+settings.ACCOUNT_EMAIL_UNIQUE = True
+settings.ACCOUNT_EMAIL_CONFIRMATION_REQUIRED = True
 settings.ACCOUNT_EMAIL_CONFIRMATION_URL = 'core>email-confirm'
 settings.ACCOUNT_PASSWORD_EXPIRY = config('ACCOUNT_PASSWORD_EXPIRY', cast=int) # As senhas expiram em x dias e precisam ser trocas após esse tempo
 settings.ACCOUNT_PASSWORD_USE_HISTORY = True
@@ -89,3 +95,6 @@ settings.EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
 settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 settings.SESSION_SECURITY_EXPIRE_AFTER = config('SESSION_SECURITY_EXPIRE_AFTER', cast=int) # Define o tempo de inatividade máximo do usuário, caso ele ultrapasse esse tempo, ele deverá fazer login novamente
 settings.SESSION_SECURITY_WARN_AFTER = config('SESSION_SECURITY_WARN_AFTER', cast=int)
+
+# Django passwords configurações
+settings.PASSWORD_MIN_LENGTH = 8
