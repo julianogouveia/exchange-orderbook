@@ -75,6 +75,7 @@ class ResetPasswordView(account.views.PasswordResetView):
 
 
 class ResetTokenView(account.views.PasswordResetTokenView):
+    form_class = forms.ResetTokenForm
 
     def get_user(self):
         uid_int = self.kwargs["uidb36"]

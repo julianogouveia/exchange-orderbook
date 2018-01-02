@@ -30,3 +30,7 @@ class SignupForm(account.forms.SignupForm):
     password = PasswordField(label=_("Password"), strip=settings.ACCOUNT_PASSWORD_STRIP)
     
     field_order = ['first_name', 'last_name', 'username', 'email', 'password', 'password_confirm', 'code']
+
+
+class ResetTokenForm(account.forms.PasswordResetTokenForm):
+    password = PasswordField(label=_("Password"), strip=settings.ACCOUNT_PASSWORD_STRIP)
