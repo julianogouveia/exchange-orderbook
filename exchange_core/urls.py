@@ -1,6 +1,6 @@
 from django.urls import re_path, path, include
 from two_factor.urls import urlpatterns as tf_urls
-from account.views import ConfirmEmailView, PasswordResetView
+from account.views import ConfirmEmailView, PasswordResetView, LogoutView
 
 from . import views
 
@@ -15,4 +15,5 @@ urlpatterns = [
 	path('account/wallets/', views.WalletsView.as_view(), name='core>wallets'),
 	path('account/signup/', views.SignupView.as_view(), name='core>signup'),
 	path('account/email-confirm/<key>/', ConfirmEmailView.as_view(), name='core>email-confirm'),
+	path('account/logout/', LogoutView.as_view(), name='core>logout'),
 ]
