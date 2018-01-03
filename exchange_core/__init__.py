@@ -109,3 +109,10 @@ settings.MESSAGE_TAGS = {
     messages.WARNING: 'alert-warning',
     messages.ERROR: 'alert-danger',
 }
+
+# Configurações de armazenamento
+settings.DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+settings.AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+settings.AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+settings.AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')

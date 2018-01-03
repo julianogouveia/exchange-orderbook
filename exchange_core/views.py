@@ -18,12 +18,6 @@ from . import forms
 from .models import Users, Accounts
 
 
-class ForgetPasswordView(FormView):
-    template_name = 'core/forget-password.html'
-    form_class = forms.ForgetPasswordForm
-    success_url = ''
-
-
 @method_decorator([login_required], name='dispatch')
 class WalletsView(TemplateView):
     template_name = 'core/wallets.html'
@@ -86,3 +80,12 @@ class ResetTokenView(account.views.PasswordResetTokenView):
         self.create_password_history(form, self.get_user())
         self.after_change_password()
         return redirect(self.get_success_url())
+
+
+class AccountSettingsView(account.views.SettingsView):
+    form_class = forms.AccountSettingsForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['avatar_form'] = forms.AvatarForm()
+        return context

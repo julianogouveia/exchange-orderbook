@@ -15,6 +15,6 @@ urlpatterns = [
 	path('account/wallets/', views.WalletsView.as_view(), name='core>wallets'),
 	path('account/signup/', views.SignupView.as_view(), name='core>signup'),
 	path('account/email-confirm/<key>/', ConfirmEmailView.as_view(), name='core>email-confirm'),
-	path('account/settings/', SettingsView.as_view(), name='core>settings'),
+	path('account/settings/', views.AccountSettingsView.as_view(), name='core>settings'),
 	path('account/logout/', LogoutView.as_view(), name='core>logout'),
 ]
