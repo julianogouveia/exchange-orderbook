@@ -45,6 +45,7 @@ settings.INSTALLED_APPS += [
     'account',
     'anymail',
     'session_security',
+    'easy_thumbnails',
 ]
 
 # Adiciona os middlewares do Two Factor para habilitar a autenticação em dois passos
@@ -116,3 +117,11 @@ settings.DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 settings.AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
 settings.AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
 settings.AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+
+# Thumbnail configurações
+settings.THUMBNAIL_DEFAULT_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+settings.THUMBNAIL_ALIASES = {
+    '': {
+        'avatar': {'size': (50, 50), 'crop': True},
+    },
+}

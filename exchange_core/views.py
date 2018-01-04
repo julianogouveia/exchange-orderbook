@@ -82,6 +82,7 @@ class ResetTokenView(account.views.PasswordResetTokenView):
         return redirect(self.get_success_url())
 
 
+@method_decorator([login_required], name='dispatch')
 class AccountSettingsView(account.views.SettingsView):
     form_class = forms.AccountSettingsForm
 
@@ -89,3 +90,12 @@ class AccountSettingsView(account.views.SettingsView):
         context = super().get_context_data(**kwargs)
         context['avatar_form'] = forms.AvatarForm()
         return context
+
+
+@method_decorator([login_required], name='dispatch')
+class AvatarView(TemplateView):
+    def post(self, request):
+        avatar_form = forms.AvatarForm(request.POST, request.FILES, instance=request.user)
+        if avatar_form.is_valid():
+            avatar_form.save()
+        return redirect(reverse('core>settings'))

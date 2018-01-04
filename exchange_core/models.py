@@ -21,7 +21,7 @@ class Users(TimeStampedModel, AbstractUser, BaseModel):
 
     sponsor = models.ForeignKey('self', null=True, blank=True, verbose_name=_("Sponsor"), on_delete=models.CASCADE)
     status = models.CharField(max_length=30, default=STATUS.created, verbose_name=_("Status"))
-    avatar = models.ImageField(blank=True, upload_to='uploaded_images')
+    avatar = models.ImageField(blank=True)
 
     objects = UserManager()
 
