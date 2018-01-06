@@ -5,12 +5,12 @@ __VERSION__ = '0.1'
 
 
 setup(
-	name='exchange-payments',
+	name='exchange-orderbook',
 	version=__VERSION__,
-	description='Exchange payments package',
+	description='Exchange orderbook package',
 	author='Juliano Gouveia',
 	author_email='juliano@neosacode.com',
-	keywords='exchange, payments, neosacode, coins',
+	keywords='exchange, orderbook, neosacode, coins',
 	packages=find_packages(exclude=[]),
 	python_requires='>=3.5'
 )
