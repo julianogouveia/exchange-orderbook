@@ -9,3 +9,6 @@ PACKAGE_NAME = 'exchange_orderbook'
 
 # Diz ao Django aonde está a configuração desse modulo
 default_app_config = PACKAGE_NAME + '.apps.Config'
+
+# Orderbook configuracoes
+settings.ORDERBOOK_BASE_CURRENCY_SESSION_NAME = config('ORDERBOOK_BASE_CURRENCY_SESSION_NAME', default='orderbook_base_currency')

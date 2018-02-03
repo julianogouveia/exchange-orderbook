@@ -47,7 +47,7 @@
 
                             <div class="form-group">
                             	<label class="tx-12">{% trans "Total" %}</label>
-	                            <div class="input-group input-group-sm">
+                            <div class="input-group input-group-sm">
 	                                <input disabled="disabled" type="text" name="" class="form-control form-control-sm" valu"0.0000000>
 	                                <span class="input-group-addon tx-size-sm lh-2">BTC</span>
 	                            </div>
@@ -102,16 +102,14 @@
                     </div>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-4" id="markets-app">
                 	<div class="row">
                         <div class="col-sm-8">
                             <h2 class="tx-roboto tx-black"><i class="zmdi zmdi-chart"></i> {% trans "Markets" %}</h2>
                         </div>
                         <div class="col-sm-4">
-                        	<div class="btn-group btn-group-sm pull-right" role="group" aria-label="Basic example">
-							  <button type="button" class="btn btn-dark active">BTC</button>
-							  <button type="button" class="btn btn-dark">EUR</button>
-							  <button type="button" class="btn btn-dark">USDT</button>
+                        	<div class="btn-group btn-group-sm pull-right" role="group">
+                              <button type="button" v-for="item in base_currencies" :class="{'btn': true, 'btn-dark': true, 'active': item.symbol == base_currency}" @click.prevent="set_base_currency(item.symbol)" v-text="item.symbol"></button>
 							</div>
                         </div>
                     </div>
@@ -119,23 +117,15 @@
                         <thead>
                             <tr>
                                 <th class="text-right"><i class="zmdi zmdi-label-alt"></i> Coin</th>
+                                <th class="text-right"><i class="zmdi zmdi-label-alt"></i> Symbol</th>
                                 <th class="text-right"><i class="zmdi zmdi-balance"></i> Price</th>
                                 <th class="text-right"><i class="zmdi zmdi-chart"></i> Volume</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="text-right">
-                                <td>BTM</td>
-                                <td>0.00001</td>
-                                <td>108.0000</td>
-                            </tr>
-                            <tr class="text-right">
-                                <td>XVG</td>
-                                <td>0.00001</td>
-                                <td>108.0000</td>
-                            </tr>
-                            <tr class="text-right">
-                                <td>BTC</td>
+                            <tr class="text-right" v-for="item in markets">
+                                <td v-text="item.name"></td>
+                                <td v-text="item.currency"></td>
                                 <td>0.00001</td>
                                 <td>108.0000</td>
                             </tr>
@@ -204,4 +194,8 @@
             </div>
         </div>
 	</div>
+{% endblock %}
+
+{% block scripts %}
+    {% include "orderbook/scripts/orders.vue.html" with base_currencies=base_currencies %}
 {% endblock %}

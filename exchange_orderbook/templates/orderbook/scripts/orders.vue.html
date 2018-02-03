@@ -1,0 +1,42 @@
+{% load scripts %}
+{% load i18n %}
+
+<script>
+	jQuery(function($) {
+		var markets_app = new Vue({
+			el: '#markets-app',
+			data: {
+				base_currencies: {{ base_currencies|serialize|safe }},
+				base_currency: null,
+				markets: null
+			},
+			methods: {
+				set_base_currency: function(coin) {
+					vm = this;
+
+					$.post('{% url "orderbook>update-base-currency" %}', {'symbol': coin}, function(response) {
+						if (response.status == 'success') {
+							vm.base_currency = coin;
+						}
+					});
+				}
+			},
+			mounted: function() {
+				vm = this;
+
+				$.get('{% url "orderbook>my-base-currency" %}', function(response) {
+					vm.base_currency = response.base_currency;
+				});
+			},
+			watch: {
+				base_currency:  function() {
+					vm = this;
+
+					$.get('{% url "orderbook>markets" %}?base_currency=' + this.base_currency, function(response) {
+						vm.markets = response;
+					});
+				}	
+			}
+		});
+	});
+</script>
