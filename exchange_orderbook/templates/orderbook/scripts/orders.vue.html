@@ -3,38 +3,191 @@
 
 <script>
 	jQuery(function($) {
+		function order_component() {
+			return {
+				data: {
+					price: null,
+					amount: null,
+					queue_position: 0,
+					base_currency: null,
+					market_currency: null,
+					market_pk: null,
+					errors: {}
+				},
+				methods: {
+					send: function(type) {
+						var data = {
+							price: this.price,
+							amount: this.amount,
+							market: this.market_pk,
+							type: type
+						};
+
+						var vm = this;
+
+						$.post('{% url "orderbook>create-order" %}', data, function(response) {
+							vm.errors = response.errors || {};
+
+							if (response.order) {
+								swal('{% trans "Success!" %}', '{% trans "Your order has been created." %}', 'success').then(function() {
+									vm.price = null;
+									vm.amount = null;
+
+									buy_orders_app.find_orders();
+									sell_orders_app.find_orders();
+									executed_orders_app.find_orders();
+								});
+							}
+							else if (response.error) {
+								swal('{% trans "Error" %}', response.error, 'error');
+							}
+						});
+					}
+
+				},
+				computed: {
+					total: function() {
+						return (this.price * this.amount).toFixed(8);
+					}
+				}
+			};
+		}
+
+		var new_s_order_config = order_component();
+		new_s_order_config.el = '#new-s-order-app';
+		var new_s_order_app = new Vue(new_s_order_config);
+
+		var new_b_order_config = order_component();
+		new_b_order_config.el = '#new-b-order-app';
+		var new_b_order_app = new Vue(new_b_order_config);
+
+		var buy_orders_app = new Vue({
+			el: '#buy-orders-app',
+			data: {
+				orders: []
+			},
+			methods: {
+				find_orders: function() {
+					var vm = this;
+
+					$.get('{% url "orderbook>buy-orders" %}', function(orders) {
+						vm.orders = orders;
+					});
+				},
+				populate_order: function(item) {
+					new_s_order_app.price = item.price;
+					new_s_order_app.amount = item.amount;
+				}
+			}
+		});
+
+		var sell_orders_app = new Vue({
+			el: '#sell-orders-app',
+			data: {
+				orders: []
+			},
+			methods: {
+				find_orders: function() {
+					var vm = this;
+
+					$.get('{% url "orderbook>sell-orders" %}', function(orders) {
+						vm.orders = orders;
+					});
+				},
+				populate_order: function(item) {
+					new_b_order_app.price = item.price;
+					new_b_order_app.amount = item.amount;
+				}
+			}
+		});
+
+		var executed_orders_app = new Vue({
+			el: '#executed-orders-app',
+			data: {
+				orders: []
+			},
+			methods: {
+				find_orders: function() {
+					var vm = this;
+
+					$.get('{% url "orderbook>executed-orders" %}', function(orders) {
+						vm.orders = orders;
+					});
+				}
+			}
+		});
+
+
 		var markets_app = new Vue({
 			el: '#markets-app',
 			data: {
 				base_currencies: {{ base_currencies|serialize|safe }},
 				base_currency: null,
-				markets: null
+				markets: null,
+				market_currency: null
 			},
 			methods: {
-				set_base_currency: function(coin) {
-					vm = this;
-
-					$.post('{% url "orderbook>update-base-currency" %}', {'symbol': coin}, function(response) {
-						if (response.status == 'success') {
-							vm.base_currency = coin;
-						}
-					});
-				}
-			},
-			mounted: function() {
-				vm = this;
-
-				$.get('{% url "orderbook>my-base-currency" %}', function(response) {
-					vm.base_currency = response.base_currency;
-				});
-			},
-			watch: {
-				base_currency:  function() {
-					vm = this;
+				set_markets: function() {
+					var vm = this;
 
 					$.get('{% url "orderbook>markets" %}?base_currency=' + this.base_currency, function(response) {
 						vm.markets = response;
 					});
+				},
+				update_apps: function(response) {
+					this.market_currency = response.market_currency;
+
+					new_s_order_app.market_currency = response.market_currency;
+					new_b_order_app.market_currency = response.market_currency;
+					new_s_order_app.market_pk = response.market_pk;
+					new_b_order_app.market_pk = response.market_pk;
+				},
+				set_base_currency: function(symbol) {
+					var vm = this;
+
+					$.post('{% url "orderbook>update-base-currency" %}', {'symbol': symbol}, function(response) {
+						vm.base_currency = response.base_currency;
+						new_s_order_app.base_currency = response.base_currency;
+						new_b_order_app.base_currency = response.base_currency;
+						
+						vm.update_apps(response);
+						buy_orders_app.find_orders();
+						sell_orders_app.find_orders();
+						executed_orders_app.find_orders();
+					});
+				},
+				set_market_currency: function(symbol) {
+					var vm = this;
+
+					$.post('{% url "orderbook>update-market-currency" %}', {'symbol': symbol}, function(response) {
+						vm.market_currency = response.market_currency;
+						vm.update_apps(response);
+						buy_orders_app.find_orders();
+						sell_orders_app.find_orders();
+						executed_orders_app.find_orders();
+					});
+				}
+			},
+			mounted: function() {
+				var vm = this;
+
+				$.get('{% url "orderbook>my-base-currency" %}', function(response) {
+					vm.base_currency = response.base_currency;
+
+					vm.set_markets();
+					vm.update_apps(response);
+					buy_orders_app.find_orders();
+					sell_orders_app.find_orders();
+					executed_orders_app.find_orders();
+
+					new_s_order_app.base_currency = response.base_currency;
+					new_b_order_app.base_currency = response.base_currency;
+
+				});
+			},
+			watch: {
+				base_currency:  function() {
+					this.set_markets();
 				}	
 			}
 		});

@@ -8,6 +8,7 @@ from exchange_core.models import BaseModel
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
 
+
 class BaseCurrencies(TimeStampedModel, BaseModel):
 	currency = models.OneToOneField('exchange_core.Currencies', related_name='base_currencies', on_delete=models.CASCADE)
 
@@ -39,10 +40,27 @@ class Orders(TimeStampedModel, BaseModel):
 	market = models.ForeignKey(Markets, related_name='orders', on_delete=models.CASCADE)
 	user = models.ForeignKey('exchange_core.Users', related_name='orders', on_delete=models.CASCADE)
 	price = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
-	unit = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
 	amount = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
 	type = models.CharField(max_length=1, choices=TYPES)
-	status = models.CharField(max_length=1, choices=STATUS, default=STATUS.created)
+	status = models.CharField(max_length=30, choices=STATUS, default=STATUS.created)
+
+	@property
+	def total(self):
+		return self.price * self.amount
+
+	@property
+	def type_name(self):
+		if self.type == self.TYPES.b:
+			return _("Buy")
+		if self.type == self.TYPES.s:
+			return _("Sell")
+
+
+class Earnings(TimeStampedModel, BaseModel):
+	active_order = models.ForeignKey(Orders, related_name='active_orders', on_delete=models.CASCADE)
+	passive_order = models.ForeignKey(Orders, related_name='passive_orders', on_delete=models.CASCADE)
+	active_fee = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
+	passive_fee = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
 
 
 @admin.register(BaseCurrencies)
