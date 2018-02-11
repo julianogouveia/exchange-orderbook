@@ -135,7 +135,7 @@
                         </div>
                         <div class="col-sm-4">
                         	<div class="btn-group btn-group-sm pull-right" role="group">
-                              <button type="button" v-for="item in base_currencies" :class="{'btn': true, 'btn-dark': true, 'active': item.symbol == base_currency}" @click.prevent="set_base_currency(item.symbol)" v-text="item.symbol"></button>
+                              <button type="button" v-for="item in base_currencies" :class="{'btn': true, 'btn-dark active': item.symbol == base_currency, 'btn-primary': item.symbol != base_currency}" @click.prevent="set_base_currency(item.symbol)" v-text="item.symbol"></button>
 							</div>
                         </div>
                     </div>
