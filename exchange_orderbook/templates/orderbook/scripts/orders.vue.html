@@ -188,7 +188,23 @@
 			watch: {
 				base_currency:  function() {
 					this.set_markets();
-				}	
+
+					orderbook_header.exchange_name = this.market_currency;
+					orderbook_header.pair = this.base_currency + '/' + this.market_currency;
+				},
+				market_currency: function() {
+					orderbook_header.exchange_name = this.market_currency;
+					orderbook_header.pair = this.base_currency + '/' + this.market_currency;
+				}
+			}
+		});
+
+
+		var orderbook_header = new Vue({
+			el: '#orderbook-header',
+			data: {
+				pair: '',
+				exchange_name: ''
 			}
 		});
 	});

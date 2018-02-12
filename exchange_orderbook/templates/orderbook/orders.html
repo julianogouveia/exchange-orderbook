@@ -29,99 +29,108 @@
 
 	<div class="card-box">
 		<div class="row">
-                <div class="col-md-4">
-                    <div class="card" id="new-b-order-app">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-sm-7">
-                                    <h6 class="mg-b-0 box-shadow tx-roboto tx-black"><i class="zmdi zmdi-chevron-down"></i> <span v-text="'{% trans "Buy" %} ' + base_currency"></h6>
-                                    <p class="tx-12 mg-b-5">{% trans "Start buy here" %}</p>
-                                </div>
-                                <div class="col-sm-5">
-                                    <button type="submit" class="btn btn-primary float-right" @click.prenvent="send('b')"><i class="zmdi zmdi-chevron-down"></i> {% trans "Buy" %}</button>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                            	<label class="tx-12">{% trans "Price" %}</label>
-	                            <div class="input-group input-group-sm">
-	                                <input type="number" class="form-control form-control-sm" v-model="price" step="0.000001" min="0">
-	                                <span class="input-group-addon tx-size-sm lh-2" v-text="base_currency"></span>
-	                            </div>
-                                <div class="help-block form-text text-muted form-control-feedback" v-show="errors.price">
-                                    <ul class="parsley-errors-list filled">
-                                        <li v-for="error_message in errors.price" v-text="error_message"></li>
-                                    </ul>
-                                  </div>
-                            </div>
-
-                            <div class="form-group">
-                            	<label class="tx-12">{% trans "Amount" %}</label>
-	                            <div class="input-group input-group-sm">
-	                                <input type="number" name="" class="form-control form-control-sm" v-model="amount" step="0.000001" min="0">
-	                                <span class="input-group-addon tx-size-sm lh-2" v-text="market_currency"></span>
-	                            </div>
-                                <div class="help-block form-text text-muted form-control-feedback" v-show="errors.amount">
-                                    <ul class="parsley-errors-list filled">
-                                        <li v-for="error_message in errors.amount" v-text="error_message"></li>
-                                    </ul>
-                                  </div>
-                            </div>
-
-                            <div class="form-group">
-                            	<label class="tx-12">{% trans "Total" %}</label>
-                            <div class="input-group input-group-sm">
-	                                <input disabled="disabled" type="text" name="" class="form-control form-control-sm" :value="total">
-	                                <span class="input-group-addon tx-size-sm lh-2" v-text="base_currency"></span>
-	                            </div>
-	                        </div>
-                        </div>
+                <div class="col-md-8">
+                    <div id="orderbook-header">
+                        <h2 v-text="exchange_name + ' {% trans "Exchange" %}'"></h2>
+                        <h6 v-text="pair"></h6>
                     </div>
-                </div>
-                <div class="col-md-4">
-                     <div class="card" id="new-s-order-app">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-sm-7">
-                                    <h6 class="mg-b-0 box-shadow tx-roboto tx-black"><i class="zmdi zmdi-chevron-up"></i> <span v-text="'{% trans "Sell" %} ' + base_currency"></span></h6>
-                                    <p class="tx-12 mg-b-5">{% trans "Start sell here" %}</p>
-                                </div>
-                                <div class="col-sm-5">
-                                    <button type="submit" class="btn btn-danger float-right" @click.prenvent="send('s')"><i class="zmdi zmdi-chevron-up"></i> {% trans "Sell" %}</button>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="tx-12">{% trans "Price" %}</label>
-                                <div class="input-group input-group-sm">
-                                    <input type="number" class="form-control form-control-sm" v-model="price" step="0.000001" min="0">
-                                    <span class="input-group-addon tx-size-sm lh-2" v-text="base_currency"></span>
-                                </div>
-                                <div class="help-block form-text text-muted form-control-feedback" v-show="errors.price">
-                                    <ul class="parsley-errors-list filled">
-                                        <li v-for="error_message in errors.price" v-text="error_message"></li>
-                                    </ul>
-                                  </div>
-                            </div>
 
-                            <div class="form-group">
-                                <label class="tx-12">{% trans "Amount" %}</label>
-                                <div class="input-group input-group-sm">
-                                    <input type="number" name="" class="form-control form-control-sm" v-model="amount" step="0.000001" min="0">
-                                    <span class="input-group-addon tx-size-sm lh-2" v-text="market_currency"></span>
-                                </div>
-                                <div class="help-block form-text text-muted form-control-feedback" v-show="errors.amount">
-                                    <ul class="parsley-errors-list filled">
-                                        <li v-for="error_message in errors.amount" v-text="error_message"></li>
-                                    </ul>
-                                  </div>
-                            </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card" id="new-b-order-app">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-sm-7">
+                                            <h6 class="mg-b-0 box-shadow tx-roboto tx-black"><i class="zmdi zmdi-chevron-down"></i> <span v-text="'{% trans "Buy" %} ' + base_currency"></h6>
+                                            <p class="tx-12 mg-b-5">{% trans "Start buy here" %}</p>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <button type="submit" class="btn btn-primary float-right" @click.prenvent="send('b')"><i class="zmdi zmdi-chevron-down"></i> {% trans "Buy" %}</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="tx-12">{% trans "Price" %}</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" class="form-control form-control-sm" v-model="price" step="0.000001" min="0">
+                                            <span class="input-group-addon tx-size-sm lh-2" v-text="base_currency"></span>
+                                        </div>
+                                        <div class="help-block form-text text-muted form-control-feedback" v-show="errors.price">
+                                            <ul class="parsley-errors-list filled">
+                                                <li v-for="error_message in errors.price" v-text="error_message"></li>
+                                            </ul>
+                                          </div>
+                                    </div>
 
-                            <div class="form-group">
-                                <label class="tx-12">{% trans "Total" %}</label>
-                            <div class="input-group input-group-sm">
-                                    <input disabled="disabled" type="text" name="" class="form-control form-control-sm" :value="total">
-                                    <span class="input-group-addon tx-size-sm lh-2" v-text="base_currency"></span>
+                                    <div class="form-group">
+                                        <label class="tx-12">{% trans "Amount" %}</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" name="" class="form-control form-control-sm" v-model="amount" step="0.000001" min="0">
+                                            <span class="input-group-addon tx-size-sm lh-2" v-text="market_currency"></span>
+                                        </div>
+                                        <div class="help-block form-text text-muted form-control-feedback" v-show="errors.amount">
+                                            <ul class="parsley-errors-list filled">
+                                                <li v-for="error_message in errors.amount" v-text="error_message"></li>
+                                            </ul>
+                                          </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="tx-12">{% trans "Total" %}</label>
+                                    <div class="input-group input-group-sm">
+                                            <input disabled="disabled" type="text" name="" class="form-control form-control-sm" :value="total">
+                                            <span class="input-group-addon tx-size-sm lh-2" v-text="base_currency"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                             <div class="card" id="new-s-order-app">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-sm-7">
+                                            <h6 class="mg-b-0 box-shadow tx-roboto tx-black"><i class="zmdi zmdi-chevron-up"></i> <span v-text="'{% trans "Sell" %} ' + base_currency"></span></h6>
+                                            <p class="tx-12 mg-b-5">{% trans "Start sell here" %}</p>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <button type="submit" class="btn btn-danger float-right" @click.prenvent="send('s')"><i class="zmdi zmdi-chevron-up"></i> {% trans "Sell" %}</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="tx-12">{% trans "Price" %}</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" class="form-control form-control-sm" v-model="price" step="0.000001" min="0">
+                                            <span class="input-group-addon tx-size-sm lh-2" v-text="base_currency"></span>
+                                        </div>
+                                        <div class="help-block form-text text-muted form-control-feedback" v-show="errors.price">
+                                            <ul class="parsley-errors-list filled">
+                                                <li v-for="error_message in errors.price" v-text="error_message"></li>
+                                            </ul>
+                                          </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="tx-12">{% trans "Amount" %}</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" name="" class="form-control form-control-sm" v-model="amount" step="0.000001" min="0">
+                                            <span class="input-group-addon tx-size-sm lh-2" v-text="market_currency"></span>
+                                        </div>
+                                        <div class="help-block form-text text-muted form-control-feedback" v-show="errors.amount">
+                                            <ul class="parsley-errors-list filled">
+                                                <li v-for="error_message in errors.amount" v-text="error_message"></li>
+                                            </ul>
+                                          </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="tx-12">{% trans "Total" %}</label>
+                                    <div class="input-group input-group-sm">
+                                            <input disabled="disabled" type="text" name="" class="form-control form-control-sm" :value="total">
+                                            <span class="input-group-addon tx-size-sm lh-2" v-text="base_currency"></span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
