@@ -190,11 +190,11 @@
 					this.set_markets();
 
 					orderbook_header.exchange_name = this.market_currency;
-					orderbook_header.pair = this.base_currency + '/' + this.market_currency;
+					orderbook_header.pair = this.market_currency + '/' + this.base_currency;
 				},
 				market_currency: function() {
 					orderbook_header.exchange_name = this.market_currency;
-					orderbook_header.pair = this.base_currency + '/' + this.market_currency;
+					orderbook_header.pair = this.market_currency + '/' + this.base_currency;
 				}
 			}
 		});
