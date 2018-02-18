@@ -1,9 +1,7 @@
 from django.conf import settings
-from django.utils import timezone
 
 from exchange_core.models import Accounts
 from exchange_orderbook.models import Orders, Earnings
-
 
 """
  https://stackoverflow.com/questions/13112062/which-are-the-order-matching-algorithms-most-commonly-used-by-electronic-financi
@@ -12,103 +10,142 @@ from exchange_orderbook.models import Orders, Earnings
  https://www.zerohedge.com/news/2014-04-19/timestamp-fraud-rigged-market-explained-one-simple-animation
 """
 
+
 # This proccess a order using the FIFO continuous trading algorithm
 class FIFO:
-	def get_accounts(self, order):
-		active_account = Accounts.objects.get(user_id=order.user_id, currency__id=order.market.base_currency.currency_id)
-		passive_account = Accounts.objects.get(user_id=order.user_id, currency__id=order.market.currency_id)
-		return [active_account, passive_account]
+    def get_accounts(self, order):
+        active_account = Accounts.objects.get(user_id=order.user_id,
+                                              currency__id=order.market.base_currency.currency_id)
+        passive_account = Accounts.objects.get(user_id=order.user_id, currency__id=order.market.currency_id)
+        return [active_account, passive_account]
 
-	def get_ask_with_fee(self, ask_amount):
-		ask_fee = ask_amount * settings.INTERMEDIATION_PASSIVE_FEE
-		return ask_amount - ask_fee
+    def get_ask_with_fee(self, ask_amount):
+        ask_fee = ask_amount * settings.INTERMEDIATION_PASSIVE_FEE
+        return ask_amount - ask_fee
 
-	def get_bid_with_fee(self, bid_amount):
-		bid_fee = bid_amount * settings.INTERMEDIATION_ACTIVE_FEE
-		return bid_amount - bid_fee
+    def get_bid_with_fee(self, bid_amount):
+        bid_fee = bid_amount * settings.INTERMEDIATION_ACTIVE_FEE
+        return bid_amount - bid_fee
 
-	def negotiate(self, bid_amount, ask_amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=None):
-		bid_amount_with_fee = self.get_bid_with_fee(bid_amount)
-		b_active_account.reserved -= bid_amount
-		b_active_account.save()
-		a_active_account.deposit += bid_amount_with_fee
-		a_active_account.save()
-		a_passive_account.reserved -= ask_amount
-		a_passive_account.save()
-		b_passive_account.deposit += self.get_ask_with_fee(ask_amount)
-		b_passive_account.save()
+    def negotiate(self, bid, ask, bid_amount, ask_amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=None):
+        bid_amount_with_fee = self.get_bid_with_fee(bid_amount)
+        b_active_account.reserved -= bid_amount
+        b_active_account.save()
+        a_active_account.deposit += bid_amount_with_fee
+        a_active_account.save()
+        a_passive_account.reserved -= ask_amount
+        a_passive_account.save()
+        b_passive_account.deposit += self.get_ask_with_fee(ask_amount)
+        b_passive_account.save()
 
-		# Give back the amount to user
-		if give_back:
-			b_active_account.reserved -= give_back
-			b_active_account.deposit += give_back
-			b_active_account.save()
+        earning = Earnings()
+        earning.active_fee = self.get_bid_with_fee(bid_amount)
+        earning.passive_fee = self.get_ask_with_fee(ask_amount)
+        earning.active_order = bid
+        earning.passive_order = ask
+        earning.save()
 
-	def finish_orders(self, bid, ask):
-		ask.status = Orders.STATUS.executed
-		ask.save()
-		bid.status = Orders.STATUS.executed
-		bid.save()
+        # Give back the amount to user
+        if give_back:
+            b_active_account.reserved -= give_back
+            b_active_account.deposit += give_back
+            b_active_account.save()
 
-	def do_exchange(self, bid, ask):
-		# Get the buyer active and passive accounts for exchange the amounts
-		b_active_account, b_passive_account = self.get_accounts(bid)
-		a_active_account, a_passive_account = self.get_accounts(ask)
+    def finish_order(self, order):
+        order.status = Orders.STATUS.executed
+        order.save()
+        return order
 
-		if ask.amount < bid.amount:
-			bid_total = ask.amount * ask.price
-			give_back = (bid.price * bid.amount) - (ask.price * ask.amount) if ask.price < bid.price else None
+    def save_bid_price(self, bid, ask):
+        bid.price = ask.price
+        bid.save()
 
-			self.negotiate(bid_total, ask.amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=give_back)
-			self.finish_orders(ask, bid)
+    def do_exchange(self, bid, ask):
+        # Get the buyer active and passive accounts for exchange the amounts
+        b_active_account, b_passive_account = self.get_accounts(bid)
+        a_active_account, a_passive_account = self.get_accounts(ask)
 
-			# Reset object to create a new one
-			bid.pk = None
-			bid.created = timezone.now()
-			bid.modified = timezone.now()
-			bid.amount = bid.amount - ask.amount
-			bid.status = Orders.STATUS.created
-			bid.save()
+        if ask.amount < bid.amount:
+            bid_total = ask.amount * ask.price
+            give_back = (bid.price * bid.amount) - (ask.price * ask.amount) if ask.price < bid.price else None
 
-		elif ask.amount > bid.amount:
-			bid_total = bid.amount * ask.price
-			ask_difference = ask.amount - bid.amount
-			give_back = (bid.price * bid.amount) - (ask.price * bid.amount) if ask.price < bid.price else None
+            self.negotiate(bid, ask, bid_total, ask.amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=give_back)
+            self.finish_order(ask)
 
-			self.negotiate(bid_total, ask_difference, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=give_back)
-			self.finish_orders(ask, bid)
+            # Take out the amount and save the order
+            # for not execute the order with the same amount again
+            bid.amount = ask.amount
+            bid.save()
 
-			# Reset object to create a new one
-			ask.pk = None
-			ask.created = timezone.now()
-			ask.modified = timezone.now()
-			ask.amount = difference
-			ask.status = Orders.STATUS.created
-			ask.save()
+            self.finish_order(bid)
+            self.save_bid_price(bid, ask)
 
-		elif ask.amount == bid.amount:
-			bid_total = bid.amount * bid.price
-			self.negotiate(bid_total, ask.amount, a_active_account, b_active_account, a_passive_account, b_passive_account)
-			self.finish_orders(ask, bid)			
+            # Reset object to create a new one
+            bid.pk = None
+            bid.amount = bid.amount - ask.amount
+            bid.status = Orders.STATUS.created
+            bid.save()
 
-	def execute(self):
-		ask_orders = Orders.objects.filter(type=Orders.TYPES.s, status=Orders.STATUS.created).order_by('price', 'created')
-		bid_orders = Orders.objects.filter(type=Orders.TYPES.b, status=Orders.STATUS.created).order_by('-price', 'created')
+        elif ask.amount > bid.amount:
+            bid_total = bid.amount * ask.price
+            give_back = abs((bid.price * bid.amount) - (ask.price * bid.amount)) if ask.price < bid.price else None
 
-		# Stops function execution if one of match queues are empty
-		if not ask_orders or not bid_orders:
-			return
+            self.negotiate(bid, ask, bid_total, bid.amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=give_back)
+            self.finish_order(bid)
 
-		high_ask = ask_orders.first()
-		high_bid = bid_orders.first()
+            # Take out the amount and save the order
+            # for not execute the order with the same amount again
+            ask.amount = bid.amount
+            ask.save()
 
-		# Stops function execution if there is no market price match
-		if high_ask.price > high_bid.price:
-			return
+            self.finish_order(ask)
 
-		# Stops if match orders can't owned to the same user
-		if high_ask.user_id == high_bid.user_id:
-			return
+            # Reset object to create a new one
+            ask.pk = None
+            ask.amount = ask.amount - bid.amount
+            ask.status = Orders.STATUS.created
+            ask.save()
 
-		# Exchange matched orders
-		self.do_exchange(high_bid, high_ask)
+        elif ask.amount == bid.amount:
+            bid_total = bid.amount * bid.price
+            give_back = abs((bid.price * bid.amount) - (ask.price * bid.amount)) if ask.price < bid.price else None
+
+            self.negotiate(bid, ask, bid_total, ask.amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=give_back)
+            self.finish_order(ask)
+
+            self.finish_order(bid)
+            self.save_bid_price(bid, ask)
+
+    def execute(self):
+        ask_orders = Orders.objects.filter(type=Orders.TYPES.s, status=Orders.STATUS.created).order_by('price', 'created')
+        bid_orders = Orders.objects.filter(type=Orders.TYPES.b, status=Orders.STATUS.created).order_by('-price', 'created')
+
+        # Stops function execution if one of match queues are empty
+        if not ask_orders or not bid_orders:
+            return
+
+        high_ask = ask_orders.first()
+        has_match = False
+
+        # Loop over bid orders for validate them
+        for bid_order in bid_orders:
+            high_bid = bid_order
+
+            # Skip to next bid if match orders can't owned to the same user
+            if high_ask.user_id == high_bid.user_id:
+                continue
+
+            # Stops function execution if there is no market price match
+            if high_ask.price > high_bid.price:
+                return
+
+            # Stops the loop, and assume that a perfect match was found
+            has_match = True
+            break
+
+        # Stops if does not exist any possible match
+        if not has_match:
+            return
+
+        # Exchange matched orders
+        self.do_exchange(high_bid, high_ask)
