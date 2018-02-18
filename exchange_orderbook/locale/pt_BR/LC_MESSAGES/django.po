@@ -1,0 +1,112 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-02-17 11:01-0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: jorge ugalde <jorgeac66@gmail.com>, 2018\n"
+"Language-Team: Portuguese (Brazil) (https://www.transifex.com/neosacode/teams/83636/pt_BR/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pt_BR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: apps.py:7 templates/orderbook/orders.html:28
+msgid "Orderbook"
+msgstr "Livro de Ofertas"
+
+#: models.py:19
+msgid "Base Currency"
+msgstr "Moeda Base"
+
+#: models.py:20
+msgid "Base Currencies"
+msgstr "Moedas Base"
+
+#: models.py:30
+msgid "Market"
+msgstr "Mercado"
+
+#: models.py:31 templates/orderbook/orders.html:143
+msgid "Markets"
+msgstr "Mercados"
+
+#: models.py:54 templates/orderbook/orders.html:44
+#: templates/orderbook/orders.html:48
+msgid "Buy"
+msgstr "Comprar"
+
+#: models.py:56 templates/orderbook/orders.html:93
+#: templates/orderbook/orders.html:97
+msgid "Sell"
+msgstr "Vender"
+
+#: templates/orderbook/orders.html:34
+msgid "Exchange"
+msgstr "Exchange"
+
+#: templates/orderbook/orders.html:45
+msgid "Start buy here"
+msgstr "Comece a comprar aqui"
+
+#: templates/orderbook/orders.html:53 templates/orderbook/orders.html:102
+#: templates/orderbook/orders.html:182 templates/orderbook/orders.html:216
+msgid "Price"
+msgstr "Preço"
+
+#: templates/orderbook/orders.html:66 templates/orderbook/orders.html:115
+#: templates/orderbook/orders.html:185 templates/orderbook/orders.html:219
+msgid "Amount"
+msgstr "Quantidade"
+
+#: templates/orderbook/orders.html:79 templates/orderbook/orders.html:128
+#: templates/orderbook/orders.html:188 templates/orderbook/orders.html:222
+msgid "Total"
+msgstr "Total"
+
+#: templates/orderbook/orders.html:94
+msgid "Start sell here"
+msgstr "Comece a vender aqui"
+
+#: templates/orderbook/orders.html:174
+msgid "Sell Orders"
+msgstr "Ordens de venda"
+
+#: templates/orderbook/orders.html:208
+msgid "Buy Orders"
+msgstr "Ordens de Compra"
+
+#: templates/orderbook/orders.html:244
+msgid "Orders History"
+msgstr "Histórico de Ordens"
+
+#: templates/orderbook/scripts/orders.vue.html:32
+msgid "Success!"
+msgstr "Sucesso!"
+
+#: templates/orderbook/scripts/orders.vue.html:32
+msgid "Your order has been created."
+msgstr "Sua ordem foi criada."
+
+#: templates/orderbook/scripts/orders.vue.html:42
+msgid "Error"
+msgstr "Erro"
+
+#: views.py:150
+msgid "Price is 0"
+msgstr "O Preço é 0"
+
+#: views.py:152
+msgid "amount is 0"
+msgstr "A quantidade é 0"
+
+#: views.py:155
+msgid "You does not have enought balance"
+msgstr "Você não tem Saldo"

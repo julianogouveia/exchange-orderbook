@@ -12,7 +12,6 @@ from account.decorators import login_required
 from exchange_core.models import Accounts
 from exchange_orderbook.models import BaseCurrencies, Markets, Orders
 from exchange_orderbook.forms import OrderForm
-from exchange_orderbook.utils import proccess_order
 
 
 @method_decorator([login_required], name='dispatch')
@@ -161,9 +160,6 @@ class CreateOrderView(View):
 
 			# Com tudo certo, salva a order no banco
 			order.save()
-
-			# Processa a order e negociado em realtime com o mercado
-			proccess_order(order)
 
 			return {'order': order.pk}
 
