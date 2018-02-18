@@ -32,10 +32,6 @@
 								swal('{% trans "Success!" %}', '{% trans "Your order has been created." %}', 'success').then(function() {
 									vm.price = null;
 									vm.amount = null;
-
-									buy_orders_app.find_orders();
-									sell_orders_app.find_orders();
-									executed_orders_app.find_orders();
 								});
 							}
 							else if (response.error) {
@@ -151,9 +147,6 @@
 						new_b_order_app.base_currency = response.base_currency;
 						
 						vm.update_apps(response);
-						buy_orders_app.find_orders();
-						sell_orders_app.find_orders();
-						executed_orders_app.find_orders();
 					});
 				},
 				set_market_currency: function(symbol) {
@@ -162,9 +155,6 @@
 					$.post('{% url "orderbook>update-market-currency" %}', {'symbol': symbol}, function(response) {
 						vm.market_currency = response.market_currency;
 						vm.update_apps(response);
-						buy_orders_app.find_orders();
-						sell_orders_app.find_orders();
-						executed_orders_app.find_orders();
 					});
 				}
 			},
@@ -176,9 +166,12 @@
 
 					vm.set_markets();
 					vm.update_apps(response);
-					buy_orders_app.find_orders();
-					sell_orders_app.find_orders();
-					executed_orders_app.find_orders();
+
+                    setInterval(function() {
+                        buy_orders_app.find_orders();
+                        sell_orders_app.find_orders();
+                        executed_orders_app.find_orders();
+					}, 1000);
 
 					new_s_order_app.base_currency = response.base_currency;
 					new_b_order_app.base_currency = response.base_currency;
