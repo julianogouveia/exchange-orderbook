@@ -3,6 +3,8 @@ from django.conf import settings
 from exchange_core.models import Accounts
 from exchange_orderbook.models import Orders, Earnings
 
+import ipdb
+
 """
  https://stackoverflow.com/questions/13112062/which-are-the-order-matching-algorithms-most-commonly-used-by-electronic-financi
  http://people.hss.caltech.edu/~pbs/fm/chunks/ch10.html
@@ -67,13 +69,15 @@ class FIFO:
 
         if ask.amount < bid.amount:
             bid_total = ask.amount * ask.price
-            give_back = (bid.price * bid.amount) - (ask.price * ask.amount) if ask.price < bid.price else None
+            give_back = abs((bid.price * ask.amount) - (ask.price * ask.amount)) if ask.price < bid.price else None
 
             self.negotiate(bid, ask, bid_total, ask.amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=give_back)
             self.finish_order(ask)
 
             # Take out the amount and save the order
             # for not execute the order with the same amount again
+            original_bid_amount = bid.amount
+            original_bid_price = bid.price
             bid.amount = ask.amount
             bid.save()
 
@@ -82,7 +86,8 @@ class FIFO:
 
             # Reset object to create a new one
             bid.pk = None
-            bid.amount = bid.amount - ask.amount
+            bid.price = original_bid_price
+            bid.amount = original_bid_amount - ask.amount
             bid.status = Orders.STATUS.created
             bid.save()
 
@@ -95,6 +100,7 @@ class FIFO:
 
             # Take out the amount and save the order
             # for not execute the order with the same amount again
+            original_ask_amount = ask.amount
             ask.amount = bid.amount
             ask.save()
 
@@ -102,12 +108,12 @@ class FIFO:
 
             # Reset object to create a new one
             ask.pk = None
-            ask.amount = ask.amount - bid.amount
+            ask.amount = original_ask_amount - bid.amount
             ask.status = Orders.STATUS.created
             ask.save()
 
         elif ask.amount == bid.amount:
-            bid_total = bid.amount * bid.price
+            bid_total = bid.amount * ask.price
             give_back = abs((bid.price * bid.amount) - (ask.price * bid.amount)) if ask.price < bid.price else None
 
             self.negotiate(bid, ask, bid_total, ask.amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=give_back)
