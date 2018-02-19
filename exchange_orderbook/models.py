@@ -72,3 +72,7 @@ class BaseCurrenciesAdmin(admin.ModelAdmin):
 @admin.register(Markets)
 class MarketsAdmin(admin.ModelAdmin):
     list_display = ('base_currency', 'currency', 'min_price', 'max_price',)
+
+@admin.register(Earnings)
+class EarningsAdmin(admin.ModelAdmin):
+    list_display = ('active_order', 'passive_order', 'active_fee', 'passive_fee',)
