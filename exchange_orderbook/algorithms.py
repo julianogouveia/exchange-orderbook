@@ -3,8 +3,6 @@ from django.conf import settings
 from exchange_core.models import Accounts
 from exchange_orderbook.models import Orders, Earnings
 
-import ipdb
-
 """
  https://stackoverflow.com/questions/13112062/which-are-the-order-matching-algorithms-most-commonly-used-by-electronic-financi
  http://people.hss.caltech.edu/~pbs/fm/chunks/ch10.html
