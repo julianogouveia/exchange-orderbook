@@ -151,14 +151,16 @@
                     <table class="table table-sm table-striped table-hover tx-12 m-t-10">
                         <thead>
                             <tr>
-                                <th class="text-right"><i class="zmdi zmdi-label-alt"></i> Coin</th>
-                                <th class="text-right"><i class="zmdi zmdi-label-alt"></i> Symbol</th>
+                                <th class="text-right"><i class="zmdi zmdi-label-alt"></i> {% trans "Coin" %}</th>
+                                <th class="text-right"><i class="zmdi zmdi-label-alt"></i> {% trans "Symbol" %}</th>
+                                <th class="text-right"><i class="zmdi zmdi-money"></i> {% trans "Price" %}</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr :class="{'text-right': true, 'active': item.currency == market_currency}" v-for="item in markets" @click.prevent="set_market_currency(item.currency)">
                                 <td v-text="item.name"></td>
                                 <td v-text="item.currency"></td>
+                                <td v-text="item.price"></td>
                             </tr>
                         </tbody>
                     </table>

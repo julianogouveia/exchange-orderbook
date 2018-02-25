@@ -1,3 +1,4 @@
+from datetime import timedelta
 from decimal import Decimal
 import importlib
 
@@ -5,6 +6,7 @@ from django.views.generic import TemplateView, View
 from django.utils.decorators import method_decorator
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 from django.db import transaction
 from jsonview.decorators import json_view
 from account.decorators import login_required
@@ -101,13 +103,23 @@ class MarketsView(View):
         markets = []
 
         for market in Markets.objects.filter(base_currency=base_currency):
+            # Filtra as orders das ultimas 24 horas e pega a com o menor preco
+            _24_hours_ago = timezone.now() - timedelta(hours=24)
+            price_qs_kwargs = dict(market=market, type=Orders.TYPES.s, created__gte=_24_hours_ago)
+            price_qs = Orders.objects.filter(**price_qs_kwargs).order_by('price')
+            price = Decimal('0.00')
+
+            if price_qs:
+                price = price_qs.first()['price']
+
             markets.append({
                 'pk': market.pk,
                 'base_currency': market.base_currency.currency.symbol,
                 'name': market.currency.name,
                 'currency': market.currency.symbol,
                 'min_price': market.min_price,
-                'max_price': market.max_price
+                'max_price': market.max_price,
+                'price': price
             })
 
         return markets
