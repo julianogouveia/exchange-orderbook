@@ -1,7 +1,7 @@
 from django.conf import settings
 
 from exchange_core.models import Accounts
-from exchange_orderbook.models import Orders, Earnings
+from exchange_orderbook.models import Orders, Earnings, Markets
 
 """
  https://stackoverflow.com/questions/13112062/which-are-the-order-matching-algorithms-most-commonly-used-by-electronic-financi
@@ -121,35 +121,36 @@ class FIFO:
             self.save_bid_price(bid, ask)
 
     def execute(self):
-        ask_orders = Orders.objects.filter(type=Orders.TYPES.s, status=Orders.STATUS.created).order_by('price', 'created')
-        bid_orders = Orders.objects.filter(type=Orders.TYPES.b, status=Orders.STATUS.created).order_by('-price', 'created')
+        for market in Markets.objects.all():
+            ask_orders = Orders.objects.filter(type=Orders.TYPES.s, status=Orders.STATUS.created, market=market).order_by('price', 'created')
+            bid_orders = Orders.objects.filter(type=Orders.TYPES.b, status=Orders.STATUS.created, market=market).order_by('-price', 'created')
 
-        # Stops function execution if one of match queues are empty
-        if not ask_orders or not bid_orders:
-            return
-
-        high_ask = ask_orders.first()
-        has_match = False
-
-        # Loop over bid orders for validate them
-        for bid_order in bid_orders:
-            high_bid = bid_order
-
-            # Skip to next bid if match orders can't owned to the same user
-            if high_ask.user_id == high_bid.user_id:
-                continue
-
-            # Stops function execution if there is no market price match
-            if high_ask.price > high_bid.price:
+            # Stops function execution if one of match queues are empty
+            if not ask_orders or not bid_orders:
                 return
 
-            # Stops the loop, and assume that a perfect match was found
-            has_match = True
-            break
+            high_ask = ask_orders.first()
+            has_match = False
 
-        # Stops if does not exist any possible match
-        if not has_match:
-            return
+            # Loop over bid orders for validate them
+            for bid_order in bid_orders:
+                high_bid = bid_order
 
-        # Exchange matched orders
-        self.do_exchange(high_bid, high_ask)
+                # Skip to next bid if match orders can't owned to the same user
+                if high_ask.user_id == high_bid.user_id:
+                    continue
+
+                # Stops function execution if there is no market price match
+                if high_ask.price > high_bid.price:
+                    return
+
+                # Stops the loop, and assume that a perfect match was found
+                has_match = True
+                break
+
+            # Stops if does not exist any possible match
+            if not has_match:
+                return
+
+            # Exchange matched orders
+            self.do_exchange(high_bid, high_ask)
