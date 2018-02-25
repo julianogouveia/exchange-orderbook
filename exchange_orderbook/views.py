@@ -110,7 +110,7 @@ class MarketsView(View):
             price = Decimal('0.00')
 
             if price_qs:
-                price = price_qs.first()['price']
+                price = price_qs.first().price
 
             markets.append({
                 'pk': market.pk,
