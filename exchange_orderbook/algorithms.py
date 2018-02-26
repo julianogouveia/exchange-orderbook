@@ -121,13 +121,15 @@ class FIFO:
             self.save_bid_price(bid, ask)
 
     def execute(self):
-        for market in Markets.objects.all():
+        markets = Markets.objects.all()
+        
+        for market in markets:
             ask_orders = Orders.objects.filter(type=Orders.TYPES.s, status=Orders.STATUS.created, market=market).order_by('price', 'created')
             bid_orders = Orders.objects.filter(type=Orders.TYPES.b, status=Orders.STATUS.created, market=market).order_by('-price', 'created')
 
             # Stops function execution if one of match queues are empty
             if not ask_orders or not bid_orders:
-                return
+                continue
 
             high_ask = ask_orders.first()
             has_match = False
@@ -150,7 +152,7 @@ class FIFO:
 
             # Stops if does not exist any possible match
             if not has_match:
-                return
+                continue
 
             # Exchange matched orders
             self.do_exchange(high_bid, high_ask)
