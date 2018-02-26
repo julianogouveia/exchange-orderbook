@@ -123,7 +123,7 @@
 				market_currency: null
 			},
 			methods: {
-				set_markets: function() {
+				find_markets: function() {
 					var vm = this;
 
 					$.get('{% url "orderbook>markets" %}?base_currency=' + this.base_currency, function(response) {
@@ -163,14 +163,13 @@
 
 				$.get('{% url "orderbook>my-base-currency" %}', function(response) {
 					vm.base_currency = response.base_currency;
-
-					vm.set_markets();
 					vm.update_apps(response);
 
                     setInterval(function() {
                         buy_orders_app.find_orders();
                         sell_orders_app.find_orders();
                         executed_orders_app.find_orders();
+                        markets_app.find_markets();
 					}, 1000);
 
 					new_s_order_app.base_currency = response.base_currency;

@@ -8,6 +8,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.db import transaction
+from django.db.models import Sum
 from jsonview.decorators import json_view
 from account.decorators import login_required
 
@@ -112,6 +113,10 @@ class MarketsView(View):
             if price_qs:
                 price = price_qs.first().price
 
+            v_aggregate = Orders.objects.filter(market=market, created__gte=_24_hours_ago).aggregate(volume=Sum('amount'))
+            volume = v_aggregate['volume'] or Decimal('0.00')
+
+
             markets.append({
                 'pk': market.pk,
                 'base_currency': market.base_currency.currency.symbol,
@@ -119,7 +124,8 @@ class MarketsView(View):
                 'currency': market.currency.symbol,
                 'min_price': market.min_price,
                 'max_price': market.max_price,
-                'price': price
+                'price': price,
+                'volume': volume
             })
 
         return markets
