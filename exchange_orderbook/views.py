@@ -198,7 +198,7 @@ class BaseOrdersView(View):
         market = Markets.objects.get(pk=market_pk)
 
         orders_queryset = Orders.objects.filter(market=market, type__in=self.order_type,
-                                                status=self.order_status).order_by(*self.order_by)[:100]
+                                                status=self.order_status).order_by(*self.order_by)[:settings.ORDERBOOK_TABLE_LIMIT]
         orders = []
 
         for order in orders_queryset:
