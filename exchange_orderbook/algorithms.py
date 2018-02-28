@@ -19,30 +19,43 @@ class FIFO:
         passive_account = Accounts.objects.get(user_id=order.user_id, currency__id=order.market.currency_id)
         return [active_account, passive_account]
 
-    def get_ask_with_fee(self, ask_amount):
-        ask_fee = ask_amount * settings.INTERMEDIATION_PASSIVE_FEE
-        return ask_amount - ask_fee
-
-    def get_bid_with_fee(self, bid_amount):
-        bid_fee = bid_amount * settings.INTERMEDIATION_ACTIVE_FEE
-        return bid_amount - bid_fee
+    def get_fee(self, amount, type):
+        if type == 'active':
+            return amount * settings.INTERMEDIATION_ACTIVE_FEE
+        elif type == 'passive':
+            return amount * settings.INTERMEDIATION_PASSIVE_FEE
 
     def negotiate(self, bid, ask, bid_amount, ask_amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=None):
-        bid_amount_with_fee = self.get_bid_with_fee(bid_amount)
+        # Faz a distincao entre order ativa e passsiva, a order ativa e sempre a order mais recente, pois ela deu origem a operacao
+        if bid.created > ask.created:
+            active_order = bid
+            passive_order = ask
+            active_amount = bid_amount
+            passive_amount = ask_amount
+            bid_amount_with_fee = bid_amount + self.get_fee(bid_amount, 'active')
+            ask_amount_with_fee = ask_amount + self.get_fee(ask_amount, 'passive')
+        else:
+            active_order = ask
+            passive_order = bid
+            active_amount = ask_amount
+            passive_amount = bid_amount
+            bid_amount_with_fee = bid_amount + self.get_fee(bid_amount, 'passive')
+            ask_amount_with_fee = ask_amount + self.get_fee(ask_amount, 'active')
+
         b_active_account.reserved -= bid_amount
         b_active_account.save()
         a_active_account.deposit += bid_amount_with_fee
         a_active_account.save()
         a_passive_account.reserved -= ask_amount
         a_passive_account.save()
-        b_passive_account.deposit += self.get_ask_with_fee(ask_amount)
+        b_passive_account.deposit += ask_amount_with_fee
         b_passive_account.save()
 
         earning = Earnings()
-        earning.active_fee = self.get_bid_with_fee(bid_amount)
-        earning.passive_fee = self.get_ask_with_fee(ask_amount)
-        earning.active_order = bid
-        earning.passive_order = ask
+        earning.active_fee = self.get_fee(active_amount, 'active')
+        earning.passive_fee = self.get_fee(passive_amount, 'passive')
+        earning.active_order = active_order
+        earning.passive_order = passive_order
         earning.save()
 
         # Give back the amount to user
