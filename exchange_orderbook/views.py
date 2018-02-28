@@ -12,7 +12,7 @@ from django.db.models import Sum
 from jsonview.decorators import json_view
 from account.decorators import login_required
 
-from exchange_core.models import Accounts
+from exchange_core.models import Currencies, Accounts
 from exchange_orderbook.models import BaseCurrencies, Markets, Orders
 from exchange_orderbook.forms import OrderForm
 
@@ -205,6 +205,7 @@ class BaseOrdersView(View):
 
         for order in orders_queryset:
             orders.append({
+                'pk': order.pk,
                 'type': order.type_name,
                 'updated': order.modified,
                 'price_currency': market.base_currency.currency.symbol,
@@ -216,6 +217,25 @@ class BaseOrdersView(View):
             })
 
         return orders
+
+
+@method_decorator([login_required, json_view], name='dispatch')
+class GetAvailableBalanceView(View):
+    def post(self, request):
+        currency = Currencies.objects.get(symbol=request.POST['symbol'])
+        account = Accounts.objects.get(user=request.user, currency=currency)
+        return {'available_balance': account.deposit}
+
+
+# Cancela a order do usuario
+@method_decorator([login_required, json_view], name='dispatch')
+class CancelMyOrderView(View):
+    def post(self, request):
+        order = Orders.objects.get(pk=request.POST['pk'], user=request.user)
+        order.status = Orders.STATUS.canceled
+        order.save()
+        return {'message': _("Your order has been canceled")}
+
 
 
 class BuyOrdersView(BaseOrdersView):

@@ -12,6 +12,8 @@
 					base_currency: null,
 					market_currency: null,
 					market_pk: null,
+					base_currency_balance: 0,
+					market_currency_balance: 0,
 					errors: {}
 				},
 				methods: {
@@ -38,8 +40,18 @@
 								swal('{% trans "Error" %}', response.error, 'error');
 							}
 						});
-					}
+					},
+					find_balances: function() {
+						var vm = this;
 
+						$.post('{% url "orderbook>get-available-balance" %}', {symbol: vm.base_currency}, function(response) {
+							vm.base_currency_balance = response.available_balance;
+						});
+
+						$.post('{% url "orderbook>get-available-balance" %}', {symbol: vm.market_currency}, function(response) {
+							vm.market_currency_balance = response.available_balance;
+						});
+					}
 				},
 				computed: {
 					total: function() {
@@ -73,6 +85,13 @@
 				populate_order: function(item) {
 					new_s_order_app.price = item.price;
 					new_s_order_app.amount = item.amount;
+				},
+				cancel_order: function(pk) {
+					if (confirm('{% trans "Are you sure you want delete this order?" %}')) {
+						$.post('{% url "orderbook>cancel-my-order-view" %}', {pk: pk}, function(response) {
+							swal(_("Success!"), response.message, 'success');
+						});
+					}
 				}
 			}
 		});
@@ -89,6 +108,13 @@
 					$.get('{% url "orderbook>sell-orders" %}', function(orders) {
 						vm.orders = orders;
 					});
+				},
+				cancel_order: function(pk) {
+					if (confirm('{% trans "Are you sure you want delete this order?" %}')) {
+						$.post('{% url "orderbook>cancel-my-order-view" %}', {pk: pk}, function(response) {
+							swal(_("Success!"), response.message, 'success');
+						});
+					}
 				},
 				populate_order: function(item) {
 					new_b_order_app.price = item.price;
@@ -166,6 +192,8 @@
 					vm.update_apps(response);
 
                     setInterval(function() {
+                        new_b_order_app.find_balances();
+                        new_s_order_app.find_balances();
                         buy_orders_app.find_orders();
                         sell_orders_app.find_orders();
                         executed_orders_app.find_orders();
@@ -179,8 +207,6 @@
 			},
 			watch: {
 				base_currency:  function() {
-					this.set_markets();
-
 					orderbook_header.exchange_name = this.market_currency;
 					orderbook_header.pair = this.market_currency + '/' + this.base_currency;
 				},

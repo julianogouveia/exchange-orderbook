@@ -21,6 +21,10 @@
         td.show-star .fa.fa-star {
             display: inline;
         }
+
+        .btn-xs {
+            padding: 0 5px;
+        }
 	</style>
 {% endblock %}
 
@@ -50,11 +54,13 @@
                                     </div>
                                     
                                     <div class="form-group">
-                                        <label class="tx-12">{% trans "Price" %}</label>
+                                        <label class="tx-12">{% trans "Price" %}</label><br>
                                         <div class="input-group input-group-sm">
                                             <input type="number" class="form-control form-control-sm" v-model="price" step="0.000001" min="0">
                                             <span class="input-group-addon tx-size-sm lh-2" v-text="base_currency"></span>
                                         </div>
+                                        <small v-text="base_currency + ' ' + '{% trans "available balance" %}: '"></small>
+                                        <small><strong v-text="base_currency_balance"></strong></small>
                                         <div class="help-block form-text text-muted form-control-feedback" v-show="errors.price">
                                             <ul class="parsley-errors-list filled">
                                                 <li v-for="error_message in errors.price" v-text="error_message"></li>
@@ -68,6 +74,8 @@
                                             <input type="number" name="" class="form-control form-control-sm" v-model="amount" step="0.000001" min="0">
                                             <span class="input-group-addon tx-size-sm lh-2" v-text="market_currency"></span>
                                         </div>
+                                        <small v-text="market_currency + ' ' + '{% trans "available balance" %}: '"></small>
+                                        <small><strong v-text="market_currency_balance"></strong></small>
                                         <div class="help-block form-text text-muted form-control-feedback" v-show="errors.amount">
                                             <ul class="parsley-errors-list filled">
                                                 <li v-for="error_message in errors.amount" v-text="error_message"></li>
@@ -99,11 +107,13 @@
                                     </div>
                                     
                                     <div class="form-group">
-                                        <label class="tx-12">{% trans "Price" %}</label>
+                                        <label class="tx-12">{% trans "Price" %}</label><br>
                                         <div class="input-group input-group-sm">
                                             <input type="number" class="form-control form-control-sm" v-model="price" step="0.000001" min="0">
                                             <span class="input-group-addon tx-size-sm lh-2" v-text="base_currency"></span>
                                         </div>
+                                        <small v-text="base_currency + ' ' + '{% trans "available balance" %}: '"></small>
+                                        <small><strong v-text="base_currency_balance"></strong></small>
                                         <div class="help-block form-text text-muted form-control-feedback" v-show="errors.price">
                                             <ul class="parsley-errors-list filled">
                                                 <li v-for="error_message in errors.price" v-text="error_message"></li>
@@ -117,6 +127,8 @@
                                             <input type="number" name="" class="form-control form-control-sm" v-model="amount" step="0.000001" min="0">
                                             <span class="input-group-addon tx-size-sm lh-2" v-text="market_currency"></span>
                                         </div>
+                                        <small v-text="market_currency + ' ' + '{% trans "available balance" %}: '"></small>
+                                        <small><strong v-text="market_currency_balance"></strong></small>
                                         <div class="help-block form-text text-muted form-control-feedback" v-show="errors.amount">
                                             <ul class="parsley-errors-list filled">
                                                 <li v-for="error_message in errors.amount" v-text="error_message"></li>
@@ -154,6 +166,7 @@
                                 <th class="text-right"><i class="zmdi zmdi-label-alt"></i> {% trans "Coin" %}</th>
                                 <th class="text-right"><i class="zmdi zmdi-label-alt"></i> {% trans "Symbol" %}</th>
                                 <th class="text-right"><i class="zmdi zmdi-money"></i> {% trans "Price" %}</th>
+                                <th class="text-right"><i class="zmdi zmdi-money"></i> {% trans "Volume" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -161,6 +174,7 @@
                                 <td v-text="item.name"></td>
                                 <td v-text="item.currency"></td>
                                 <td v-text="item.price"></td>
+                                <td v-text="item.volume"></td>
                             </tr>
                         </tbody>
                     </table>
@@ -196,7 +210,7 @@
                                     <td v-text="item.price + ' - ' + item.price_currency"></td>
                                     <td v-text="item.amount + ' - ' + item.amount_currency"></td>
                                     <td v-text="item.total + ' - ' + item.price_currency"></td>
-                                    <td :class="{'show-star': item.is_mine}"><i class="fa fa-star"></i></td>
+                                    <td :class="{'show-star': item.is_mine}"><i class="fa fa-star"></i> <a href="#" @click.prevent="cancel_order(item.pk)" class="btn btn-xs btn-danger" title="{% trans "Cancel my order" %}"><strong>&times;</strong></a></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -230,7 +244,7 @@
                                     <td v-text="item.price + ' - ' + item.price_currency"></td>
                                     <td v-text="item.amount + ' - ' + item.amount_currency"></td>
                                     <td v-text="item.total + ' - ' + item.price_currency"></td>
-                                    <td :class="{'show-star': item.is_mine}"><i class="fa fa-star"></i></td>
+                                    <td :class="{'show-star': item.is_mine}"><i class="fa fa-star"></i> <a href="#" @click.prevent="cancel_order(item.pk)" class="btn btn-xs btn-danger" title="{% trans "Cancel my order" %}"><strong>&times;</strong></a></td>
                                 </tr>
                             </tbody>
                         </table>

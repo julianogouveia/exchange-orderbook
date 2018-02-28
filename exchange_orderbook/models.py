@@ -36,7 +36,7 @@ class Orders(TimeStampedModel, BaseModel):
     # B for buy
     # S for sell
     TYPES = Choices('b', 's')
-    STATUS = Choices('created', 'executed')
+    STATUS = Choices('created', 'executed', 'canceled')
 
     market = models.ForeignKey(Markets, related_name='orders', on_delete=models.CASCADE)
     user = models.ForeignKey('exchange_core.Users', related_name='orders', on_delete=models.CASCADE)
