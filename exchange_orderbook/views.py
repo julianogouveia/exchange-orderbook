@@ -104,15 +104,13 @@ class MarketsView(View):
         markets = []
 
         for market in Markets.objects.filter(base_currency=base_currency):
-            # Filtra as orders das ultimas 24 horas e pega a com o menor preco
-            _24_hours_ago = timezone.now() - timedelta(hours=24)
-            price_qs_kwargs = dict(market=market, type=Orders.TYPES.s, created__gte=_24_hours_ago)
-            price_qs = Orders.objects.filter(**price_qs_kwargs).order_by('price')
+            price_qs = Orders.objects.filter(market=market, status=Orders.STATUS.executed, type=Orders.TYPES.s).order_by('-modified')
             price = Decimal('0.00')
 
             if price_qs:
                 price = price_qs.first().price
 
+            _24_hours_ago = timezone.now() - timedelta(hours=24)
             v_aggregate = Orders.objects.filter(market=market, created__gte=_24_hours_ago).aggregate(volume=Sum('amount'))
             volume = v_aggregate['volume'] or Decimal('0.00')
 
@@ -231,7 +229,7 @@ class GetAvailableBalanceView(View):
 @method_decorator([login_required, json_view], name='dispatch')
 class CancelMyOrderView(View):
     def post(self, request):
-        order = Orders.objects.get(pk=request.POST['pk'], user=request.user)
+        order = Orders.objects.get(pk=request.POST['pk'], user=request.user, status=Orders.STATUS.created)
         order.status = Orders.STATUS.canceled
         order.save()
         return {'message': _("Your order has been canceled")}
