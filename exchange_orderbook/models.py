@@ -46,7 +46,9 @@ class Orders(TimeStampedModel, BaseModel):
     status = models.CharField(max_length=30, choices=STATUS, default=STATUS.created)
 
     def __str__(self):
-        return '{} | {} - {} | {} - {}'.format(self.type, self.price, self.market.base_currency.symbol, self.amount, self.market.currency.symbol)
+        return '{} | {} | {} - {} | {} - {}'.format(self.user.username, self.type, self.price, 
+                                                    self.market.base_currency.currency.symbol, 
+                                                    self.amount, self.market.currency.symbol)
 
     @property
     def total(self):
