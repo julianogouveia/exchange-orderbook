@@ -229,9 +229,22 @@ class GetAvailableBalanceView(View):
 @method_decorator([login_required, json_view], name='dispatch')
 class CancelMyOrderView(View):
     def post(self, request):
-        order = Orders.objects.get(pk=request.POST['pk'], user=request.user, status=Orders.STATUS.created)
-        order.status = Orders.STATUS.canceled
-        order.save()
+        with transaction.atomic():
+            order = Orders.objects.get(pk=request.POST['pk'], user=request.user, status=Orders.STATUS.created)
+            order.status = Orders.STATUS.canceled
+            order.save()
+
+            if order.type == Orders.TYPES.s:
+                account = Accounts.objects.get(user=request.user, currency=order.market.currency)
+                account.reserved -= order.amount
+                account.deposit += order.amount
+                account.save()
+            elif order.type == Orders.TYPES.b:
+                account = Accounts.objects.get(user=request.user, currency=order.market.base_currency.currency)
+                account.reserved -= order.total
+                account.deposit += order.total
+                account.save()
+
         return {'message': _("Your order has been canceled")}
 
 
