@@ -32,15 +32,15 @@ class FIFO:
             passive_order = ask
             active_amount = bid_amount
             passive_amount = ask_amount
-            bid_amount_with_fee = bid_amount + self.get_fee(bid_amount, 'active')
-            ask_amount_with_fee = ask_amount + self.get_fee(ask_amount, 'passive')
+            bid_amount_with_fee = bid_amount - self.get_fee(bid_amount, 'active')
+            ask_amount_with_fee = ask_amount - self.get_fee(ask_amount, 'passive')
         else:
             active_order = ask
             passive_order = bid
             active_amount = ask_amount
             passive_amount = bid_amount
-            bid_amount_with_fee = bid_amount + self.get_fee(bid_amount, 'passive')
-            ask_amount_with_fee = ask_amount + self.get_fee(ask_amount, 'active')
+            bid_amount_with_fee = bid_amount - self.get_fee(bid_amount, 'passive')
+            ask_amount_with_fee = ask_amount - self.get_fee(ask_amount, 'active')
 
         b_active_account.reserved -= bid_amount
         b_active_account.save()
