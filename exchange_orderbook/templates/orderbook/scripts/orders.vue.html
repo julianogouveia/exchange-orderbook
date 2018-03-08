@@ -49,13 +49,15 @@
 					find_balances: function() {
 						var vm = this;
 
-						$.post('{% url "orderbook>get-available-balance" %}', {symbol: vm.base_currency}, function(response) {
+						var post_1 = $.post('{% url "orderbook>get-available-balance" %}', {symbol: vm.base_currency}, function(response) {
 							vm.base_currency_balance = response.available_balance;
 						});
 
-						$.post('{% url "orderbook>get-available-balance" %}', {symbol: vm.market_currency}, function(response) {
+						var post_2 = $.post('{% url "orderbook>get-available-balance" %}', {symbol: vm.market_currency}, function(response) {
 							vm.market_currency_balance = response.available_balance;
 						});
+
+						return [post_1, post_2]
 					}
 				},
 				computed: {
@@ -89,7 +91,7 @@
 						only_my_orders_qs = '?only_my_orders=true';
 					}
 
-					$.get('{% url "orderbook>buy-orders" %}' + only_my_orders_qs, function(orders) {
+					return $.get('{% url "orderbook>buy-orders" %}' + only_my_orders_qs, function(orders) {
 						vm.orders = orders;
 					});
 				},
@@ -99,6 +101,7 @@
 				},
 				cancel_order: function(pk) {
 					if (confirm('{% trans "Are you sure you want delete this order?" %}')) {
+						swal.showLoading();
 						$.post('{% url "orderbook>cancel-my-order-view" %}', {pk: pk}, function(response) {
 							swal(_("Success!"), response.message, 'success');
 						});
@@ -123,7 +126,7 @@
 						only_my_orders_qs = '?only_my_orders=true';
 					}
 
-					$.get('{% url "orderbook>sell-orders" %}' + only_my_orders_qs, function(orders) {
+					return $.get('{% url "orderbook>sell-orders" %}' + only_my_orders_qs, function(orders) {
 						vm.orders = orders;
 					});
 				},
@@ -150,7 +153,7 @@
 				find_orders: function() {
 					var vm = this;
 
-					$.get('{% url "orderbook>executed-orders" %}', function(orders) {
+					return $.get('{% url "orderbook>executed-orders" %}', function(orders) {
 						vm.orders = orders;
 					});
 				}
@@ -170,7 +173,7 @@
 				find_markets: function() {
 					var vm = this;
 
-					$.get('{% url "orderbook>markets" %}?base_currency=' + this.base_currency, function(response) {
+					return $.get('{% url "orderbook>markets" %}?base_currency=' + this.base_currency, function(response) {
 						vm.markets = response;
 					});
 				},
@@ -209,16 +212,35 @@
 					vm.base_currency = response.base_currency;
 					vm.update_apps(response);
 
+					var buy_orders_request = {abort: function(){}};
+					var sell_orders_request = {abort: function(){}};
+					var executed_orders_request = {abort: function(){}};
+					var new_b_order_request = [];
+					var new_s_order_request = [];
+					var markets_request = {abort: function(){}};
+
                     setInterval(function() {
-                        buy_orders_app.find_orders();
-                        sell_orders_app.find_orders();
-                        executed_orders_app.find_orders();
+                    	buy_orders_request.abort();
+						sell_orders_request.abort();
+						executed_orders_request.abort();
+
+                        buy_orders_request = buy_orders_app.find_orders();
+                        sell_orders_request = sell_orders_app.find_orders();
+                        executed_orders_request = executed_orders_app.find_orders();
 					}, 1000);
 
 					setInterval(function() {
-						new_b_order_app.find_balances();
-                        new_s_order_app.find_balances();
-                        markets_app.find_markets();
+						for (i in new_b_order_request) {
+                        	new_b_order_request[i].abort();
+                        }
+                        for (i in new_s_order_request) {
+                        	new_s_order_request[i].abort();
+                        }
+                        markets_request.abort();
+
+						new_b_order_request = new_b_order_app.find_balances();
+                        new_s_order_request = new_s_order_app.find_balances();
+                        markets_request = markets_app.find_markets();
 					}, 1000);
 
 					new_s_order_app.base_currency = response.base_currency;
