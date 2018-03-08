@@ -188,7 +188,7 @@ class BaseOrdersView(View):
     order_by = []
 
     def get(self, request):
-        only_my_orders = request.GET.get('only_my_orders')
+        only_my_orders = request.GET.get('only_my_orders', '')
 
         if settings.ORDERBOOK_BASE_CURRENCY_SESSION_NAME in request.user.profile:
             base_currency = request.user.profile[settings.ORDERBOOK_BASE_CURRENCY_SESSION_NAME]
@@ -205,7 +205,7 @@ class BaseOrdersView(View):
             'status': self.order_status
         }
 
-        if only_my_orders:
+        if len(only_my_orders) > 0:
             filter_kwargs.update({'user': request.user})
 
         orders_queryset = Orders.objects.select_related('market__base_currency__currency', 'market__currency').filter(**filter_kwargs).order_by(*self.order_by)[:settings.ORDERBOOK_TABLE_LIMIT]

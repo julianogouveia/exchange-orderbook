@@ -41,6 +41,8 @@
 							else if (response.error) {
 								swal('{% trans "Error" %}', response.error, 'error');
 							}
+
+							swal.stopLoading();
 						});
 					},
 					find_balances: function() {
@@ -207,13 +209,16 @@
 					vm.update_apps(response);
 
                     setInterval(function() {
-                        new_b_order_app.find_balances();
-                        new_s_order_app.find_balances();
                         buy_orders_app.find_orders();
                         sell_orders_app.find_orders();
                         executed_orders_app.find_orders();
+					}, 1000);
+
+					setInterval(function() {
+						new_b_order_app.find_balances();
+                        new_s_order_app.find_balances();
                         markets_app.find_markets();
-					}, 2000);
+					}, 1000);
 
 					new_s_order_app.base_currency = response.base_currency;
 					new_b_order_app.base_currency = response.base_currency;
