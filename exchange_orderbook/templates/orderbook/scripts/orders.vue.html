@@ -18,6 +18,8 @@
 				},
 				methods: {
 					send: function(type) {
+						swal.showLoading();
+
 						var data = {
 							price: this.price,
 							amount: this.amount,
@@ -72,13 +74,19 @@
 		var buy_orders_app = new Vue({
 			el: '#buy-orders-app',
 			data: {
-				orders: []
+				orders: [],
+				only_my_orders: false
 			},
 			methods: {
 				find_orders: function() {
 					var vm = this;
+					var only_my_orders_qs = '';
 
-					$.get('{% url "orderbook>buy-orders" %}', function(orders) {
+					if (this.only_my_orders) {
+						only_my_orders_qs = '?only_my_orders=true';
+					}
+
+					$.get('{% url "orderbook>buy-orders" %}' + only_my_orders_qs, function(orders) {
 						vm.orders = orders;
 					});
 				},
@@ -99,13 +107,20 @@
 		var sell_orders_app = new Vue({
 			el: '#sell-orders-app',
 			data: {
-				orders: []
+				orders: [],
+				only_my_orders: false
 			},
 			methods: {
 				find_orders: function() {
 					var vm = this;
 
-					$.get('{% url "orderbook>sell-orders" %}', function(orders) {
+					var only_my_orders_qs = '';
+
+					if (this.only_my_orders) {
+						only_my_orders_qs = '?only_my_orders=true';
+					}
+
+					$.get('{% url "orderbook>sell-orders" %}' + only_my_orders_qs, function(orders) {
 						vm.orders = orders;
 					});
 				},
@@ -198,7 +213,7 @@
                         sell_orders_app.find_orders();
                         executed_orders_app.find_orders();
                         markets_app.find_markets();
-					}, 1000);
+					}, 2000);
 
 					new_s_order_app.base_currency = response.base_currency;
 					new_b_order_app.base_currency = response.base_currency;

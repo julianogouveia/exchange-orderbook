@@ -104,14 +104,14 @@ class MarketsView(View):
         markets = []
 
         for market in Markets.objects.filter(base_currency=base_currency):
-            price_qs = Orders.objects.filter(market=market, status=Orders.STATUS.executed, type=Orders.TYPES.s).order_by('-modified')
+            price_qs = Orders.objects.select_related('market__base_currency__currency', 'market__currency').filter(market=market, status=Orders.STATUS.executed, type=Orders.TYPES.s).order_by('-modified')
             price = Decimal('0.00')
 
             if price_qs:
                 price = price_qs.first().price
 
             _24_hours_ago = timezone.now() - timedelta(hours=24)
-            v_aggregate = Orders.objects.filter(market=market, created__gte=_24_hours_ago).aggregate(volume=Sum('amount'))
+            v_aggregate = Orders.objects.select_related('market__base_currency__currency', 'market__currency').filter(market=market, created__gte=_24_hours_ago).aggregate(volume=Sum('amount'))
             volume = v_aggregate['volume'] or Decimal('0.00')
 
 
@@ -188,6 +188,8 @@ class BaseOrdersView(View):
     order_by = []
 
     def get(self, request):
+        only_my_orders = request.GET.get('only_my_orders')
+
         if settings.ORDERBOOK_BASE_CURRENCY_SESSION_NAME in request.user.profile:
             base_currency = request.user.profile[settings.ORDERBOOK_BASE_CURRENCY_SESSION_NAME]
         else:
@@ -197,8 +199,16 @@ class BaseOrdersView(View):
         market_pk = request.user.profile[market_session_name]
         market = Markets.objects.get(pk=market_pk)
 
-        orders_queryset = Orders.objects.filter(market=market, type__in=self.order_type,
-                                                status=self.order_status).order_by(*self.order_by)[:settings.ORDERBOOK_TABLE_LIMIT]
+        filter_kwargs = {
+            'market': market, 
+            'type__in': self.order_type,
+            'status': self.order_status
+        }
+
+        if only_my_orders:
+            filter_kwargs.update({'user': request.user})
+
+        orders_queryset = Orders.objects.select_related('market__base_currency__currency', 'market__currency').filter(**filter_kwargs).order_by(*self.order_by)[:settings.ORDERBOOK_TABLE_LIMIT]
         orders = []
 
         for order in orders_queryset:
