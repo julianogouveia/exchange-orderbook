@@ -41,8 +41,9 @@
 							else if (response.error) {
 								swal('{% trans "Error" %}', response.error, 'error');
 							}
-
-							swal.stopLoading();
+							else {
+								swal.close();
+							}
 						});
 					},
 					find_balances: function() {
