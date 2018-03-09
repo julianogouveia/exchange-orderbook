@@ -227,9 +227,7 @@
                         buy_orders_request = buy_orders_app.find_orders();
                         sell_orders_request = sell_orders_app.find_orders();
                         executed_orders_request = executed_orders_app.find_orders();
-					}, 1000);
 
-					setInterval(function() {
 						for (i in new_b_order_request) {
                         	new_b_order_request[i].abort();
                         }
@@ -241,7 +239,7 @@
 						new_b_order_request = new_b_order_app.find_balances();
                         new_s_order_request = new_s_order_app.find_balances();
                         markets_request = markets_app.find_markets();
-					}, 1000);
+					}, 2000);
 
 					new_s_order_app.base_currency = response.base_currency;
 					new_b_order_app.base_currency = response.base_currency;
