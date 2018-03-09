@@ -49,15 +49,28 @@
 					find_balances: function() {
 						var vm = this;
 
-						var post_1 = $.post('{% url "orderbook>get-available-balance" %}', {symbol: vm.base_currency}, function(response) {
-							vm.base_currency_balance = response.available_balance;
-						});
+						function get_available_balance_1() {
+							$.post('{% url "orderbook>get-available-balance" %}', {symbol: vm.base_currency}, function(response) {
+								vm.base_currency_balance = response.available_balance;
+							}).always(function() {
+								setTimeout(function() {
+									get_available_balance_1();
+								}, 500);
+							});
+						}
 
-						var post_2 = $.post('{% url "orderbook>get-available-balance" %}', {symbol: vm.market_currency}, function(response) {
-							vm.market_currency_balance = response.available_balance;
-						});
+						function get_available_balance_2() {
+							$.post('{% url "orderbook>get-available-balance" %}', {symbol: vm.market_currency}, function(response) {
+								vm.market_currency_balance = response.available_balance;
+							}).always(function() {
+								setTimeout(function() {
+									get_available_balance_2();
+								}, 500);
+							});
+						}
 
-						return [post_1, post_2]
+						get_available_balance_1();
+						get_available_balance_2();
 					}
 				},
 				computed: {
@@ -85,15 +98,24 @@
 			methods: {
 				find_orders: function() {
 					var vm = this;
-					var only_my_orders_qs = '';
+					
+					function get_buy_orders() {
+						var only_my_orders_qs = '';
 
-					if (this.only_my_orders) {
-						only_my_orders_qs = '?only_my_orders=true';
+						if (vm.only_my_orders) {
+							only_my_orders_qs = '?only_my_orders=true';
+						}
+
+						$.get('{% url "orderbook>buy-orders" %}' + only_my_orders_qs, function(orders) {
+							vm.orders = orders;
+						}).always(function() {
+							setTimeout(function() {
+								get_buy_orders();
+							}, 500);
+						});
 					}
 
-					return $.get('{% url "orderbook>buy-orders" %}' + only_my_orders_qs, function(orders) {
-						vm.orders = orders;
-					});
+					get_buy_orders();
 				},
 				populate_order: function(item) {
 					new_s_order_app.price = item.price;
@@ -120,15 +142,23 @@
 				find_orders: function() {
 					var vm = this;
 
-					var only_my_orders_qs = '';
+					function get_sell_orders() {
+						var only_my_orders_qs = '';
 
-					if (this.only_my_orders) {
-						only_my_orders_qs = '?only_my_orders=true';
+						if (vm.only_my_orders) {
+							only_my_orders_qs = '?only_my_orders=true';
+						}
+
+						$.get('{% url "orderbook>sell-orders" %}' + only_my_orders_qs, function(orders) {
+							vm.orders = orders;
+						}).always(function() {
+							setTimeout(function() {
+								get_sell_orders();
+							}, 500);
+						});
 					}
 
-					return $.get('{% url "orderbook>sell-orders" %}' + only_my_orders_qs, function(orders) {
-						vm.orders = orders;
-					});
+					get_sell_orders();
 				},
 				cancel_order: function(pk) {
 					if (confirm('{% trans "Are you sure you want delete this order?" %}')) {
@@ -153,7 +183,7 @@
 				find_orders: function() {
 					var vm = this;
 
-					return $.get('{% url "orderbook>executed-orders" %}', function(orders) {
+					$.get('{% url "orderbook>executed-orders" %}', function(orders) {
 						vm.orders = orders;
 					});
 				}
@@ -173,9 +203,17 @@
 				find_markets: function() {
 					var vm = this;
 
-					return $.get('{% url "orderbook>markets" %}?base_currency=' + this.base_currency, function(response) {
-						vm.markets = response;
-					});
+					function get_markets() {
+						$.get('{% url "orderbook>markets" %}?base_currency=' + vm.base_currency, function(response) {
+							vm.markets = response;
+						}).always(function() {
+							setTimeout(function() {
+								get_markets	();
+							}, 500);
+						});
+					}
+
+					get_markets();
 				},
 				update_apps: function(response) {
 					this.market_currency = response.market_currency;
@@ -212,34 +250,13 @@
 					vm.base_currency = response.base_currency;
 					vm.update_apps(response);
 
-					var buy_orders_request = {abort: function(){}};
-					var sell_orders_request = {abort: function(){}};
-					var executed_orders_request = {abort: function(){}};
-					var new_b_order_request = [];
-					var new_s_order_request = [];
-					var markets_request = {abort: function(){}};
+                    buy_orders_app.find_orders();
+                    sell_orders_app.find_orders();
+                    executed_orders_app.find_orders();
 
-                    setInterval(function() {
-                    	buy_orders_request.abort();
-						sell_orders_request.abort();
-						executed_orders_request.abort();
-
-                        buy_orders_request = buy_orders_app.find_orders();
-                        sell_orders_request = sell_orders_app.find_orders();
-                        executed_orders_request = executed_orders_app.find_orders();
-
-						for (i in new_b_order_request) {
-                        	new_b_order_request[i].abort();
-                        }
-                        for (i in new_s_order_request) {
-                        	new_s_order_request[i].abort();
-                        }
-                        markets_request.abort();
-
-						new_b_order_request = new_b_order_app.find_balances();
-                        new_s_order_request = new_s_order_app.find_balances();
-                        markets_request = markets_app.find_markets();
-					}, 2000);
+					new_b_order_app.find_balances();
+                    new_s_order_app.find_balances();
+                    markets_app.find_markets();
 
 					new_s_order_app.base_currency = response.base_currency;
 					new_b_order_app.base_currency = response.base_currency;
