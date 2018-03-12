@@ -183,9 +183,13 @@
 				find_orders: function() {
 					var vm = this;
 
-					$.get('{% url "orderbook>executed-orders" %}', function(orders) {
-						vm.orders = orders;
-					});
+					function get_executed_orders() {
+						$.get('{% url "orderbook>executed-orders" %}', function(orders) {
+							vm.orders = orders;
+						}).always(get_executed_orders);
+					}
+
+					get_executed_orders();
 				}
 			}
 		});
