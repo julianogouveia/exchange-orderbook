@@ -157,7 +157,7 @@ class FIFO:
 
                 # Stops function execution if there is no market price match
                 if high_ask.price > high_bid.price:
-                    return
+                    break
 
                 # Stops the loop, and assume that a perfect match was found
                 has_match = True
