@@ -25,7 +25,7 @@ class OrdersView(TemplateView):
         context = super().get_context_data()
         context['base_currencies'] = []
 
-        for base_currency in BaseCurrencies.objects.all():
+        for base_currency in BaseCurrencies.objects.order_by('order'):
             context['base_currencies'].append({
                 'pk': base_currency.pk,
                 'symbol': base_currency.currency.symbol

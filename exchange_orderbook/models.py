@@ -12,6 +12,7 @@ from model_utils.models import TimeStampedModel
 class BaseCurrencies(TimeStampedModel, BaseModel):
     currency = models.OneToOneField('exchange_core.Currencies', related_name='base_currencies',
                                     on_delete=models.CASCADE)
+    order = models.IntegerField(default=100)
 
     def __str__(self):
         return self.currency.name
