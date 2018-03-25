@@ -2,11 +2,11 @@ from decimal import Decimal
 
 from django.db import models
 from django.conf import settings
-from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
-from exchange_core.models import BaseModel
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
+
+from exchange_core.models import BaseModel
 
 
 class BaseCurrencies(TimeStampedModel, BaseModel):
@@ -68,17 +68,3 @@ class Earnings(TimeStampedModel, BaseModel):
     passive_order = models.OneToOneField(Orders, related_name='passive_orders', on_delete=models.CASCADE)
     active_fee = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
     passive_fee = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
-
-
-@admin.register(BaseCurrencies)
-class BaseCurrenciesAdmin(admin.ModelAdmin):
-    list_display = ('currency',)
-
-
-@admin.register(Markets)
-class MarketsAdmin(admin.ModelAdmin):
-    list_display = ('base_currency', 'currency', 'min_price', 'max_price',)
-
-@admin.register(Earnings)
-class EarningsAdmin(admin.ModelAdmin):
-    list_display = ('active_order', 'passive_order', 'active_fee', 'passive_fee',)

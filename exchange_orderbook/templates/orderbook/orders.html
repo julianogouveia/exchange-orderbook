@@ -188,7 +188,15 @@
                     <div class="card-box" id="sell-orders-app">
                         <div class="row">
                             <div class="col-sm-12">
-                                <h5><i class="zmdi zmdi-chevron-up"></i> {% trans "Sell Orders" %}</h5>
+                                <h5>
+                                    <i class="zmdi zmdi-chevron-up"></i> {% trans "Sell Orders" %}
+                                    <div class="custom-control custom-checkbox pull-right">
+                                        <label for="myorder-sell" style="font-size: 14px;">
+                                            <input type="checkbox" id="myorder-sell" v-model="only_my_orders">
+                                            {% trans "See only my orders" %}
+                                        </label>
+                                    </div>
+                                </h5>
                             </div>
                         </div>
                         <hr>
@@ -222,7 +230,15 @@
                     <div class="card-box" id="buy-orders-app">
                         <div class="row">
                             <div class="col-sm-12">
-                                <h5><i class="zmdi zmdi-chevron-down"></i> {% trans "Buy Orders" %}</h5>
+                                <h5>
+                                    <i class="zmdi zmdi-chevron-down"></i> {% trans "Buy Orders" %}
+                                    <div class="custom-control custom-checkbox pull-right">
+                                        <label for="myorder-buy" style="font-size: 14px;">
+                                            <input type="checkbox" id="myorder-buy" v-model="only_my_orders">
+                                            {% trans "See only my orders" %}
+                                        </label>
+                                    </div>
+                                </h5>
                             </div>
                         </div>
                         <hr>
