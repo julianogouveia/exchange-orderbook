@@ -26,7 +26,7 @@ class Markets(TimeStampedModel, BaseModel):
     base_currency = models.ForeignKey(BaseCurrencies, related_name='markets', on_delete=models.CASCADE)
     currency = models.ForeignKey('exchange_core.Currencies', related_name='markets', on_delete=models.CASCADE)
     min_price = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
-    max_price = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
+    max_price = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('1000000.00'))
 
     class Meta:
         verbose_name = _("Market")

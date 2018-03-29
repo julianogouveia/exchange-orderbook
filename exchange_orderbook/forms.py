@@ -1,9 +1,27 @@
+from decimal import Decimal
 from django import forms
+from django.utils.translation import ugettext_lazy as _
 
-from exchange_orderbook.models import Orders
+from exchange_orderbook.models import Orders, Markets
 
 
 class OrderForm(forms.ModelForm):
 	class Meta:
 		model = Orders
 		fields = ('market', 'price', 'amount', 'type',)
+
+	def clean_price(self):
+		market = self.cleaned_data['market']
+		price = self.cleaned_data['price']
+
+		if not isinstance(market, Markets):
+			raise forms.ValidationError(_("Invalid market selected"))
+
+		if market.min_price > price:
+			raise forms.ValidationError(_("Min price for this market is {}".format(market.min_price)))
+
+		if market.max_price < price:
+			raise forms.ValidationError(_("Max price for this market is {}".format(market.max_price)))
+
+		return price
+
