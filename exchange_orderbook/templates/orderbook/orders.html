@@ -181,7 +181,11 @@
                     </table>
                 </div>
             </div>
-            
+
+            <div class="card-box m-t-20">
+                <h5 class="m-b-20"><i class="zmdi zmdi-chart"></i> {% trans "Market trade chart" %}</h5>
+                <div id="chartdiv" style="height: 400px;"></div>
+            </div>
 
             <div class="row m-t-30">
                 <div class="col-md-6">
@@ -301,5 +305,10 @@
 {% endblock %}
 
 {% block scripts %}
+    <script src="//www.amcharts.com/lib/3/amcharts.js"></script>
+    <script src="//www.amcharts.com/lib/3/serial.js"></script>
+    <script src="//www.amcharts.com/lib/3/themes/light.js"></script>
+    <script src="//www.amcharts.com/lib/3/amstock.js"></script>
+    <script src="//www.amcharts.com/lib/3/plugins/dataloader/dataloader.min.js"></script>
     {% include "orderbook/scripts/orders.vue.html" with base_currencies=base_currencies %}
 {% endblock %}
