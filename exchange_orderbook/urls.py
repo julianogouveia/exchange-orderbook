@@ -15,4 +15,5 @@ urlpatterns = [
 	path('orderbook/buy-orders', views.BuyOrdersView.as_view(), name='orderbook>buy-orders'),
 	path('orderbook/sell-orders', views.SellOrdersView.as_view(), name='orderbook>sell-orders'),
 	path('orderbook/executed-orders', views.ExecutedOrdersView.as_view(), name='orderbook>executed-orders'),
+	path('orderbook/ohlc', views.OHLCView.as_view(), name='orderbook>ohlc'),
 ]

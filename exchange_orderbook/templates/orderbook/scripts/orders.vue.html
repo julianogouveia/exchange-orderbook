@@ -50,7 +50,7 @@
 
 						function get_available_balance_1() {
 							$.post('{% url "orderbook>get-available-balance" %}', {symbol: vm.base_currency}, function(response) {
-								vm.base_currency_balance = response.available_balance;
+								vm.base_currency_balance = parseFloat(response.available_balance).toFixed(8);
 							}).always(function() {
 								setTimeout(function() {
 									get_available_balance_1();
@@ -60,7 +60,7 @@
 
 						function get_available_balance_2() {
 							$.post('{% url "orderbook>get-available-balance" %}', {symbol: vm.market_currency}, function(response) {
-								vm.market_currency_balance = response.available_balance;
+								vm.market_currency_balance = parseFloat(response.available_balance).toFixed(8);
 							}).always(function() {
 								setTimeout(function() {
 									get_available_balance_2();

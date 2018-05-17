@@ -68,3 +68,12 @@ class Earnings(TimeStampedModel, BaseModel):
     passive_order = models.OneToOneField(Orders, related_name='passive_orders', on_delete=models.CASCADE)
     active_fee = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
     passive_fee = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
+
+
+class OHLC(BaseModel):
+    market = models.ForeignKey(Markets, related_name='ohlc', on_delete=models.CASCADE)
+    timestamp = models.DateField()
+    open = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
+    high = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
+    low = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
+    close = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))

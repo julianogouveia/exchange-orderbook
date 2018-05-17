@@ -1,5 +1,6 @@
 from datetime import timedelta
 from decimal import Decimal
+import time
 import importlib
 
 from django.views.generic import TemplateView, View
@@ -13,7 +14,7 @@ from jsonview.decorators import json_view
 from account.decorators import login_required
 
 from exchange_core.models import Currencies, Accounts
-from exchange_orderbook.models import BaseCurrencies, Markets, Orders
+from exchange_orderbook.models import BaseCurrencies, Markets, Orders, OHLC
 from exchange_orderbook.forms import OrderForm
 
 
@@ -273,3 +274,25 @@ class ExecutedOrdersView(BaseOrdersView):
     order_type = [Orders.TYPES.s, Orders.TYPES.b]
     order_status = Orders.STATUS.executed
     order_by = ['-modified', 'price']
+
+
+@method_decorator([login_required, json_view], name='dispatch')
+class OHLCView(View):
+    def get(self, request):
+        user = request.user
+        base_currency = user.profile[settings.ORDERBOOK_BASE_CURRENCY_SESSION_NAME]
+        market_session_name = settings.ORDERBOOK_MARKET_SESSION_NAME + '_' + base_currency
+        market_pk = request.user.profile[market_session_name]
+        market = Markets.objects.get(pk=market_pk)
+        response = []
+
+        for ohlc in OHLC.objects.filter(market=market).order_by('timestamp'):
+            response.append([
+                int('{}{}'.format(int(time.mktime(ohlc.timestamp.timetuple())), '000')),
+                float(ohlc.open),
+                float(ohlc.high),
+                float(ohlc.low),
+                float(ohlc.close)
+            ])
+
+        return response
