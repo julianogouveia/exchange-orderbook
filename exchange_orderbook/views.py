@@ -201,7 +201,7 @@ class BaseOrdersView(View):
         market = Markets.objects.get(pk=market_pk)
 
         filter_kwargs = {
-            'market': market, 
+            'market': market,
             'type__in': self.order_type,
             'status': self.order_status
         }
@@ -221,7 +221,7 @@ class BaseOrdersView(View):
                 'price': order.price,
                 'amount_currency': market.currency.symbol,
                 'amount': order.amount,
-                'total': round(order.price * order.amount, 8),
+                'total': '{:8f}'.format(round(order.total, 8)),
                 'is_mine': request.user.pk == order.user.pk
             })
 
