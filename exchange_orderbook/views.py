@@ -218,9 +218,9 @@ class BaseOrdersView(View):
                 'type': order.type_name,
                 'updated': order.modified,
                 'price_currency': market.base_currency.currency.symbol,
-                'price': order.price,
+                'price': '{:8f}'.format(order.price),
                 'amount_currency': market.currency.symbol,
-                'amount': order.amount,
+                'amount': '{:8f}'.format(order.amount),
                 'total': '{:8f}'.format(round(order.total, 8)),
                 'is_mine': request.user.pk == order.user.pk
             })
