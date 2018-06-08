@@ -1,6 +1,8 @@
+import gevent
+from django.db import transaction
 from django.conf import settings
-
 from exchange_core.models import Accounts
+from exchange_core.utils import close_db_connection
 from exchange_orderbook.models import Orders, Earnings, Markets
 
 """
@@ -133,16 +135,15 @@ class FIFO:
             self.finish_order(bid)
             self.save_bid_price(bid, ask)
 
-    def execute(self):
-        markets = Markets.objects.all()
-        
-        for market in markets:
+    @close_db_connection
+    def execute(self, market):
+        with transaction.atomic():
             ask_orders = Orders.objects.filter(type=Orders.TYPES.s, status=Orders.STATUS.created, market=market).order_by('price', 'created')
             bid_orders = Orders.objects.filter(type=Orders.TYPES.b, status=Orders.STATUS.created, market=market).order_by('-price', 'created')
 
             # Stops function execution if one of match queues are empty
             if not ask_orders or not bid_orders:
-                continue
+                return
 
             high_ask = ask_orders.first()
             has_match = False
@@ -164,8 +165,10 @@ class FIFO:
                 break
 
             # Stops if does not exist any possible match
-            if not has_match:
-                continue
+            if has_match:
+                # Exchange matched orders
+                self.do_exchange(high_bid, high_ask)
 
-            # Exchange matched orders
-            self.do_exchange(high_bid, high_ask)
+    def spawn(self):
+        gevent.wait([gevent.spawn(self.execute, market)
+                    for market in Markets.objects.all()])
