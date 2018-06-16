@@ -123,7 +123,7 @@ class MarketsView(View):
                 'currency': market.currency.symbol,
                 'min_price': market.min_price,
                 'max_price': market.max_price,
-                'price': price,
+                'price': '{:8f}'.format(price),
                 'volume': volume
             })
 
