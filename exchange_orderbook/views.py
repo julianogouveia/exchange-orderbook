@@ -123,7 +123,7 @@ class MarketsView(View):
                 'currency': market.currency.symbol,
                 'min_price': market.min_price,
                 'max_price': market.max_price,
-                'price': price,
+                'price': '{:8f}'.format(price),
                 'volume': volume
             })
 
@@ -233,7 +233,7 @@ class GetAvailableBalanceView(View):
     def post(self, request):
         currency = Currencies.objects.get(symbol=request.POST['symbol'])
         account = Accounts.objects.get(user=request.user, currency=currency)
-        return {'available_balance': account.deposit}
+        return {'available_balance': '{:8f}'.format(account.deposit)}
 
 
 # Cancela a order do usuario
