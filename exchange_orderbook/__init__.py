@@ -15,7 +15,7 @@ default_app_config = PACKAGE_NAME + '.apps.Config'
 # Orderbook configuracoes de sessao
 settings.ORDERBOOK_BASE_CURRENCY_SESSION_NAME = config('ORDERBOOK_BASE_CURRENCY_SESSION_NAME', default='orderbook_base_currency')
 settings.ORDERBOOK_MARKET_SESSION_NAME = config('ORDERBOOK_MARKET_SESSION_NAME', default='orderbook_market')
-settings.INTERMEDIATION_PASSIVE_FEE = config('ORDERBOOK_MARKET_SESSION_NAME', default=Decimal('0.003'), cast=Decimal)
+settings.INTERMEDIATION_PASSIVE_FEE = config('INTERMEDIATION_PASSIVE_FEE', default=Decimal('0.003'), cast=Decimal)
 settings.INTERMEDIATION_ACTIVE_FEE = config('INTERMEDIATION_ACTIVE_FEE', default=Decimal('0.005'), cast=Decimal)
 
 # Configurações de listagem da página de orders
