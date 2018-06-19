@@ -14,29 +14,34 @@ class Command(BaseCommand):
     help = 'Generate the OHLC table for stocks chart'        
 
     def handle(self, *args, **options):
-        markets = Markets.objects.all()
+        while True:
+            markets = Markets.objects.all()
 
-        for market in markets:
-            orders = Orders.objects.filter(status=Orders.STATUS.executed, modified__date__lt=timezone.now(), market=market, type=Orders.TYPES.s).order_by('created')
-            start_date = orders.first().created.date()
-            end_date = (timezone.now() - timedelta(1)).date()
+            for market in markets:
+                orders = Orders.objects.filter(status=Orders.STATUS.executed, modified__date__lt=timezone.now(), market=market, type=Orders.TYPES.s).order_by('created')
 
-            with transaction.atomic():
-                for date in daterange(start_date, end_date):
-                    date_orders = Orders.objects.filter(status=Orders.STATUS.executed, modified__date=date, market=market, type=Orders.TYPES.s)
-                    
-                    if OHLC.objects.filter(timestamp=date, market=market).exists():
-                        print('Record already exists for date {}'.format(date))
-                        continue
+                if not orders.exists():
+                    continue
 
-                    ohlc = OHLC()
-                    ohlc.timestamp = date
-                    ohlc.open = getattr(date_orders.first(), 'price', None) or 0
-                    ohlc.high = getattr(date_orders.order_by('-price').first(), 'price', None) or 0
-                    ohlc.low = getattr(date_orders.order_by('price').first(), 'price', None) or 0
-                    ohlc.close = getattr(date_orders.last(), 'price', None) or 0
-                    ohlc.market = market
-                    ohlc.save()
+                start_date = orders.first().created.date()
+                end_date = (timezone.now() - timedelta(1)).date()
 
-                    print(ohlc.open, ohlc.high, ohlc.low, ohlc.close)
-                    print('Recording OHLC for date {}'.format(date))
+                with transaction.atomic():
+                    for date in daterange(start_date, end_date):
+                        date_orders = Orders.objects.filter(status=Orders.STATUS.executed, modified__date=date, market=market, type=Orders.TYPES.s)
+
+                        if OHLC.objects.filter(timestamp=date, market=market).exists():
+                            print('Record already exists for date {}'.format(date))
+                            continue
+
+                        ohlc = OHLC()
+                        ohlc.timestamp = date
+                        ohlc.open = getattr(date_orders.first(), 'price', None) or 0
+                        ohlc.high = getattr(date_orders.order_by('-price').first(), 'price', None) or 0
+                        ohlc.low = getattr(date_orders.order_by('price').first(), 'price', None) or 0
+                        ohlc.close = getattr(date_orders.last(), 'price', None) or 0
+                        ohlc.market = market
+                        ohlc.save()
+
+                        print(ohlc.open, ohlc.high, ohlc.low, ohlc.close)
+                        print('Recording OHLC for date {}'.format(date))
