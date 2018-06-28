@@ -19,8 +19,4 @@ class EarningsAdmin(admin.ModelAdmin):
 @admin.register(Orders)
 class OrdersAdmin(admin.ModelAdmin):
     orders = ('orders')
-
-    class Meta:
-        verbose_name = ("Order")
-        verbose_name_plural = ("Orders")
     
