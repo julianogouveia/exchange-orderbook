@@ -1,6 +1,6 @@
 from django.contrib import admin
 from exchange_core.admin import BaseAdmin
-from exchange_orderbook.models import BaseCurrencies, Markets, Earnings
+from exchange_orderbook.models import BaseCurrencies, Markets, Earnings, Orders
 
 
 @admin.register(BaseCurrencies)
