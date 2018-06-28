@@ -15,3 +15,8 @@ class MarketsAdmin(admin.ModelAdmin):
 @admin.register(Earnings)
 class EarningsAdmin(admin.ModelAdmin):
     list_display = ('active_order', 'passive_order', 'active_fee', 'passive_fee',)
+
+@admin.register(Orders)
+class OrdersAdmin(admin.ModelAdmin):
+    orders = ('orders')
+    
