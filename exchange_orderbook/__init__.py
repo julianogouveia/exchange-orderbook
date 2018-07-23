@@ -21,7 +21,7 @@ settings.INTERMEDIATION_ACTIVE_FEE = config('INTERMEDIATION_ACTIVE_FEE', default
 # Configurações de listagem da página de orders
 settings.ORDERBOOK_TABLE_LIMIT = config('ORDERBOOK_TABLE_LIMIT', default=50)
 settings.STOCK_CHART_THEME = config('STOCK_CHART_THEME', default='light')
-settings.STOCK_CHART_HEIGHT = config('STOCK_CHART_HEIGHT', default='400', cast=int)
+settings.STOCK_CHART_HEIGHT = config('STOCK_CHART_HEIGHT', default=400, cast=int)
 
 # Adiciona o contexto para as configuracoes do projeto
 settings.TEMPLATES[0]['OPTIONS']['context_processors'] += [
