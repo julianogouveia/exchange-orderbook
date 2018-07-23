@@ -71,7 +71,8 @@ Highcharts.theme = {
         labels: {
             style: {
                 color: '#E0E0E3'
-            }
+            },
+            format: '{value:.8f}'
         },
         lineColor: '#707073',
         minorGridLineColor: '#505053',
@@ -88,7 +89,8 @@ Highcharts.theme = {
         labels: {
             style: {
                 color: '#E0E0E3'
-            }
+            },
+            format: '{value:.8f}'
         },
         lineColor: '#707073',
         minorGridLineColor: '#505053',
@@ -98,7 +100,7 @@ Highcharts.theme = {
             style: {
                 color: '#A0A0A3'
             }
-        }
+        },
     },
     tooltip: {
         backgroundColor: 'rgba(0, 0, 0, 0.85)',
@@ -2307,17 +2309,7 @@ window.onload = function () {
     }
 
     function getHeight() {
-        return Math.max(
-            400,
-            Math.min(
-                1000,
-                Math.round(
-                    window.innerHeight -
-                    Highcharts.offset(document.getElementById('demo')).top -
-                    16
-                )
-            )
-        );
+        return {{ STOCK_CHART_HEIGHT }};
     }
     document.getElementById('container-inner').style.height = getHeight() + 'px';
 
