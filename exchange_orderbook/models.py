@@ -62,6 +62,9 @@ class Orders(TimeStampedModel, BaseModel):
         if self.type == self.TYPES.s:
             return _("Sell")
 
+    class Meta:
+        verbose_name = ("Order")
+        verbose_name_plural = ("Orders")
 
 class Earnings(TimeStampedModel, BaseModel):
     active_order = models.OneToOneField(Orders, related_name='active_orders', on_delete=models.CASCADE)
