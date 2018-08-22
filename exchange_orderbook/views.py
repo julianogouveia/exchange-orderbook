@@ -112,9 +112,8 @@ class MarketsView(View):
                 price = price_qs.first().price
 
             _24_hours_ago = timezone.now() - timedelta(hours=24)
-            v_aggregate = Orders.objects.select_related('market__base_currency__currency', 'market__currency').filter(market=market, created__gte=_24_hours_ago).aggregate(volume=Sum('amount'))
-            volume = v_aggregate['volume'] or Decimal('0.00')
-
+            v_aggregate = Orders.objects.select_related('market__base_currency__currency', 'market__currency').filter(type=Orders.TYPES.s, market=market, created__gte=_24_hours_ago).aggregate(volume=Sum('price') * Sum('amount'))
+            volume = round(v_aggregate['volume'] or Decimal('0.00'), 8)
 
             markets.append({
                 'pk': market.pk,
@@ -124,7 +123,7 @@ class MarketsView(View):
                 'min_price': market.min_price,
                 'max_price': market.max_price,
                 'price': '{:8f}'.format(price),
-                'volume': volume
+                'volume': '{:8f}'.format(volume)
             })
 
         return markets

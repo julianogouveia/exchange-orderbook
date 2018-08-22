@@ -3,27 +3,30 @@ from decimal import Decimal
 from django.conf import settings
 from prettyconf.configuration import Configuration
 
-# Diz ao pretty conf o path do .env caso não existam variáveis de ambiente para a respectiva config
+# Tells to prettyconf the .env path
 config = Configuration(starting_path=settings.BASE_DIR)
 
-# Define o nome do modulo
+# Defines the exchange_orderbook package name
 PACKAGE_NAME = 'exchange_orderbook'
 
-# Diz ao Django aonde está a configuração desse modulo
+# Tells to django where is the configuration class of this package
 default_app_config = PACKAGE_NAME + '.apps.Config'
 
-# Orderbook configuracoes de sessao
+# Orderbook session config
 settings.ORDERBOOK_BASE_CURRENCY_SESSION_NAME = config('ORDERBOOK_BASE_CURRENCY_SESSION_NAME', default='orderbook_base_currency')
 settings.ORDERBOOK_MARKET_SESSION_NAME = config('ORDERBOOK_MARKET_SESSION_NAME', default='orderbook_market')
 settings.INTERMEDIATION_PASSIVE_FEE = config('INTERMEDIATION_PASSIVE_FEE', default=Decimal('0.003'), cast=Decimal)
 settings.INTERMEDIATION_ACTIVE_FEE = config('INTERMEDIATION_ACTIVE_FEE', default=Decimal('0.005'), cast=Decimal)
 
-# Configurações de listagem da página de orders
+# Orders listing config
 settings.ORDERBOOK_TABLE_LIMIT = config('ORDERBOOK_TABLE_LIMIT', default=50)
 settings.STOCK_CHART_THEME = config('STOCK_CHART_THEME', default='light')
 settings.STOCK_CHART_HEIGHT = config('STOCK_CHART_HEIGHT', default=400, cast=int)
 
-# Adiciona o contexto para as configuracoes do projeto
+#
+settings.ALLOW_SAME_USER_ORDER_MATCH = config('ALLOW_SAME_USER_ORDER_MATCH', default=False, cast=config.boolean)
+
+# Adds the context for project configuration
 settings.TEMPLATES[0]['OPTIONS']['context_processors'] += [
     PACKAGE_NAME + '.context_processors.exchange',
 ]
