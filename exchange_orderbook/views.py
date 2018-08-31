@@ -1,7 +1,6 @@
 from datetime import timedelta
 from decimal import Decimal
 import time
-import importlib
 
 from django.views.generic import TemplateView, View
 from django.utils.decorators import method_decorator
@@ -9,7 +8,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import Sum, F
 from jsonview.decorators import json_view
 from account.decorators import login_required
 
@@ -112,9 +111,10 @@ class MarketsView(View):
                 price = price_qs.first().price
 
             _24_hours_ago = timezone.now() - timedelta(hours=24)
-            v_aggregate = Orders.objects.select_related('market__base_currency__currency', 'market__currency').filter(market=market, created__gte=_24_hours_ago).aggregate(volume=Sum('amount'))
-            volume = v_aggregate['volume'] or Decimal('0.00')
-
+            v_aggregate = Orders.objects.select_related('market__base_currency__currency', 'market__currency')\
+                .filter(type=Orders.TYPES.s, status=Orders.STATUS.executed, market=market, created__gte=_24_hours_ago)\
+                .aggregate(volume=Sum(F('price') * F('amount')))
+            volume = round(v_aggregate['volume'] or Decimal('0.00'), 8)
 
             markets.append({
                 'pk': market.pk,
@@ -124,7 +124,7 @@ class MarketsView(View):
                 'min_price': market.min_price,
                 'max_price': market.max_price,
                 'price': '{:8f}'.format(price),
-                'volume': volume
+                'volume': '{:8f}'.format(volume)
             })
 
         return markets

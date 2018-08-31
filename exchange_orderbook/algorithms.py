@@ -157,7 +157,7 @@ class FIFO:
                 high_bid = bid_order
 
                 # Skip to next bid if match orders can't owned to the same user
-                if high_ask.user_id == high_bid.user_id:
+                if high_ask.user_id == high_bid.user_id and not settings.ALLOW_SAME_USER_ORDER_MATCH:
                     continue
 
                 # Stops function execution if there is no market price match
