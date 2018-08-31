@@ -1,7 +1,6 @@
 from decimal import Decimal
 
 from django.db import models
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
@@ -43,6 +42,7 @@ class Orders(TimeStampedModel, BaseModel):
     user = models.ForeignKey('exchange_core.Users', related_name='orders', on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
     amount = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
+    fee = models.DecimalField(max_digits=20, decimal_places=8, null=True)
     type = models.CharField(max_length=1, choices=TYPES)
     status = models.CharField(max_length=30, choices=STATUS, default=STATUS.created)
 
@@ -66,7 +66,8 @@ class Orders(TimeStampedModel, BaseModel):
         verbose_name = ("Order")
         verbose_name_plural = ("Orders")
 
-class Earnings(TimeStampedModel, BaseModel):
+
+class Matchs(TimeStampedModel, BaseModel):
     active_order = models.OneToOneField(Orders, related_name='active_orders', on_delete=models.CASCADE)
     passive_order = models.OneToOneField(Orders, related_name='passive_orders', on_delete=models.CASCADE)
     active_fee = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))

@@ -1,9 +1,10 @@
 import gevent
+from decimal import Decimal
 from django.db import transaction
 from django.conf import settings
 from exchange_core.models import Accounts
 from exchange_core.utils import close_db_connection
-from exchange_orderbook.models import Orders, Earnings, Markets
+from exchange_orderbook.models import Orders, Matchs, Markets
 
 """
  https://stackoverflow.com/questions/13112062/which-are-the-order-matching-algorithms-most-commonly-used-by-electronic-financi
@@ -53,12 +54,12 @@ class FIFO:
         b_passive_account.deposit += ask_amount_with_fee
         b_passive_account.save()
 
-        earning = Earnings()
-        earning.active_fee = self.get_fee(active_amount, 'active')
-        earning.passive_fee = self.get_fee(passive_amount, 'passive')
-        earning.active_order = active_order
-        earning.passive_order = passive_order
-        earning.save()
+        match = Matchs()
+        match.active_fee = self.get_fee(active_amount, 'active')
+        match.passive_fee = self.get_fee(passive_amount, 'passive')
+        match.active_order = active_order
+        match.passive_order = passive_order
+        match.save()
 
         # Give back the amount to user
         if give_back:
@@ -66,8 +67,11 @@ class FIFO:
             b_active_account.deposit += give_back
             b_active_account.save()
 
-    def finish_order(self, order):
+        return (bid_amount_with_fee, ask_amount_with_fee)
+
+    def finish_order(self, order, fee=None):
         order.status = Orders.STATUS.executed
+        order.fee = fee
         order.save()
         return order
 
@@ -84,8 +88,8 @@ class FIFO:
             bid_total = ask.amount * ask.price
             give_back = abs((bid.price * ask.amount) - (ask.price * ask.amount)) if ask.price < bid.price else None
 
-            self.negotiate(bid, ask, bid_total, ask.amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=give_back)
-            self.finish_order(ask)
+            bid_fee, ask_fee = self.negotiate(bid, ask, bid_total, ask.amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=give_back)
+            self.finish_order(ask, ask_fee)
 
             # Take out the amount and save the order
             # for not execute the order with the same amount again
@@ -94,7 +98,7 @@ class FIFO:
             bid.amount = ask.amount
             bid.save()
 
-            self.finish_order(bid)
+            self.finish_order(bid, bid_fee)
             self.save_bid_price(bid, ask)
 
             # Reset object to create a new one
@@ -108,8 +112,8 @@ class FIFO:
             bid_total = bid.amount * ask.price
             give_back = abs((bid.price * bid.amount) - (ask.price * bid.amount)) if ask.price < bid.price else None
 
-            self.negotiate(bid, ask, bid_total, bid.amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=give_back)
-            self.finish_order(bid)
+            bid_fee, ask_fee = self.negotiate(bid, ask, bid_total, bid.amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=give_back)
+            self.finish_order(bid, bid_fee)
 
             # Take out the amount and save the order
             # for not execute the order with the same amount again
@@ -117,7 +121,7 @@ class FIFO:
             ask.amount = bid.amount
             ask.save()
 
-            self.finish_order(ask)
+            self.finish_order(ask, ask_fee)
 
             # Reset object to create a new one
             ask.pk = None
@@ -129,10 +133,10 @@ class FIFO:
             bid_total = bid.amount * ask.price
             give_back = abs((bid.price * bid.amount) - (ask.price * bid.amount)) if ask.price < bid.price else None
 
-            self.negotiate(bid, ask, bid_total, ask.amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=give_back)
-            self.finish_order(ask)
+            bid_fee, ask_fee = self.negotiate(bid, ask, bid_total, ask.amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=give_back)
+            self.finish_order(ask, ask_fee)
 
-            self.finish_order(bid)
+            self.finish_order(bid, bid_fee)
             self.save_bid_price(bid, ask)
 
     @close_db_connection

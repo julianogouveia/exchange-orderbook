@@ -1,6 +1,6 @@
 from django.contrib import admin
 from exchange_core.admin import BaseAdmin
-from exchange_orderbook.models import BaseCurrencies, Markets, Earnings, Orders
+from exchange_orderbook.models import BaseCurrencies, Markets, Matchs, Orders
 
 
 @admin.register(BaseCurrencies)
@@ -12,8 +12,8 @@ class BaseCurrenciesAdmin(admin.ModelAdmin):
 class MarketsAdmin(admin.ModelAdmin):
     list_display = ('base_currency', 'currency', 'min_price', 'max_price',)
 
-@admin.register(Earnings)
-class EarningsAdmin(admin.ModelAdmin):
+@admin.register(Matchs)
+class MatchsAdmin(admin.ModelAdmin):
     list_display = ('active_order', 'passive_order', 'active_fee', 'passive_fee',)
 
 @admin.register(Orders)
