@@ -1,7 +1,7 @@
 import gevent
-from decimal import Decimal
 from django.db import transaction
 from django.conf import settings
+from django.utils import timezone
 from exchange_core.models import Accounts
 from exchange_core.utils import close_db_connection
 from exchange_orderbook.models import Orders, Matchs, Markets
@@ -28,7 +28,8 @@ class FIFO:
         elif type == 'passive':
             return amount * settings.INTERMEDIATION_PASSIVE_FEE
 
-    def negotiate(self, bid, ask, bid_amount, ask_amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=None):
+    def negotiate(self, bid, ask, bid_amount, ask_amount, a_active_account, b_active_account, a_passive_account,
+                  b_passive_account, give_back=None):
         # Faz a distincao entre order ativa e passsiva, a order ativa e sempre a order mais recente, pois ela deu origem a operacao
         if bid.created > ask.created:
             active_order = bid
@@ -72,6 +73,7 @@ class FIFO:
     def finish_order(self, order, fee=None):
         order.status = Orders.STATUS.executed
         order.fee = fee
+        order.executed_at = timezone.now()
         order.save()
         return order
 
@@ -88,7 +90,8 @@ class FIFO:
             bid_total = ask.amount * ask.price
             give_back = abs((bid.price * ask.amount) - (ask.price * ask.amount)) if ask.price < bid.price else None
 
-            bid_fee, ask_fee = self.negotiate(bid, ask, bid_total, ask.amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=give_back)
+            bid_fee, ask_fee = self.negotiate(bid, ask, bid_total, ask.amount, a_active_account, b_active_account,
+                                              a_passive_account, b_passive_account, give_back=give_back)
             self.finish_order(ask, ask_fee)
 
             # Take out the amount and save the order
@@ -112,7 +115,8 @@ class FIFO:
             bid_total = bid.amount * ask.price
             give_back = abs((bid.price * bid.amount) - (ask.price * bid.amount)) if ask.price < bid.price else None
 
-            bid_fee, ask_fee = self.negotiate(bid, ask, bid_total, bid.amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=give_back)
+            bid_fee, ask_fee = self.negotiate(bid, ask, bid_total, bid.amount, a_active_account, b_active_account,
+                                              a_passive_account, b_passive_account, give_back=give_back)
             self.finish_order(bid, bid_fee)
 
             # Take out the amount and save the order
@@ -133,7 +137,8 @@ class FIFO:
             bid_total = bid.amount * ask.price
             give_back = abs((bid.price * bid.amount) - (ask.price * bid.amount)) if ask.price < bid.price else None
 
-            bid_fee, ask_fee = self.negotiate(bid, ask, bid_total, ask.amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=give_back)
+            bid_fee, ask_fee = self.negotiate(bid, ask, bid_total, ask.amount, a_active_account, b_active_account,
+                                              a_passive_account, b_passive_account, give_back=give_back)
             self.finish_order(ask, ask_fee)
 
             self.finish_order(bid, bid_fee)
@@ -175,4 +180,4 @@ class FIFO:
 
     def spawn(self):
         gevent.wait([gevent.spawn(self.execute, market)
-                    for market in Markets.objects.all()])
+                     for market in Markets.objects.all()])

@@ -17,8 +17,8 @@ class BaseCurrencies(TimeStampedModel, BaseModel):
         return self.currency.name
 
     class Meta:
-        verbose_name = _("Base Currency")
-        verbose_name_plural = _("Base Currencies")
+        verbose_name = _("Market")
+        verbose_name_plural = _("Markets")
 
 
 class Markets(TimeStampedModel, BaseModel):
@@ -27,9 +27,12 @@ class Markets(TimeStampedModel, BaseModel):
     min_price = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
     max_price = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('1000000.00'))
 
+    def __str__(self):
+        return '{}/{}'.format(self.base_currency.currency.symbol, self.currency.symbol)
+
     class Meta:
-        verbose_name = _("Market")
-        verbose_name_plural = _("Markets")
+        verbose_name = _("Pair")
+        verbose_name_plural = _("Pairs")
 
 
 class Orders(TimeStampedModel, BaseModel):
@@ -38,13 +41,14 @@ class Orders(TimeStampedModel, BaseModel):
     TYPES = Choices('b', 's')
     STATUS = Choices('created', 'executed', 'canceled')
 
-    market = models.ForeignKey(Markets, related_name='orders', on_delete=models.CASCADE)
+    market = models.ForeignKey(Markets, related_name='orders', on_delete=models.CASCADE, verbose_name=_("Pair"))
     user = models.ForeignKey('exchange_core.Users', related_name='orders', on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
     amount = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
     fee = models.DecimalField(max_digits=20, decimal_places=8, null=True)
     type = models.CharField(max_length=1, choices=TYPES)
     status = models.CharField(max_length=30, choices=STATUS, default=STATUS.created)
+    executed_at = models.DateTimeField(null=True)
 
     def __str__(self):
         return '{} | {} | {} - {} | {} - {}'.format(self.user.username, self.type, self.price, 
@@ -65,6 +69,7 @@ class Orders(TimeStampedModel, BaseModel):
     class Meta:
         verbose_name = ("Order")
         verbose_name_plural = ("Orders")
+        ordering = ['-created']
 
 
 class Matchs(TimeStampedModel, BaseModel):
@@ -72,6 +77,10 @@ class Matchs(TimeStampedModel, BaseModel):
     passive_order = models.OneToOneField(Orders, related_name='passive_orders', on_delete=models.CASCADE)
     active_fee = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
     passive_fee = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
+
+    class Meta:
+        verbose_name = _("Match")
+        verbose_name_plural = _("Matchs")
 
 
 class OHLC(BaseModel):
