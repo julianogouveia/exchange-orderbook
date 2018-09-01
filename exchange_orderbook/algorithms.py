@@ -36,15 +36,19 @@ class FIFO:
             passive_order = ask
             active_amount = bid_amount
             passive_amount = ask_amount
-            bid_amount_with_fee = bid_amount - self.get_fee(bid_amount, 'active')
-            ask_amount_with_fee = ask_amount - self.get_fee(ask_amount, 'passive')
+            bid_fee = self.get_fee(bid_amount, 'active')
+            ask_fee = self.get_fee(ask_amount, 'passive')
+            bid_amount_with_fee = bid_amount - bid_fee
+            ask_amount_with_fee = ask_amount - ask_fee
         else:
             active_order = ask
             passive_order = bid
             active_amount = ask_amount
             passive_amount = bid_amount
-            bid_amount_with_fee = bid_amount - self.get_fee(bid_amount, 'passive')
-            ask_amount_with_fee = ask_amount - self.get_fee(ask_amount, 'active')
+            bid_fee = self.get_fee(bid_amount, 'passive')
+            ask_fee = self.get_fee(ask_amount, 'active')
+            bid_amount_with_fee = bid_amount - bid_fee
+            ask_amount_with_fee = ask_amount - ask_fee
 
         b_active_account.reserved -= bid_amount
         b_active_account.save()
@@ -68,7 +72,7 @@ class FIFO:
             b_active_account.deposit += give_back
             b_active_account.save()
 
-        return (bid_amount_with_fee, ask_amount_with_fee)
+        return (bid_fee, ask_fee)
 
     def finish_order(self, order, fee=None):
         order.status = Orders.STATUS.executed
