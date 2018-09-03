@@ -46,6 +46,7 @@ class Orders(TimeStampedModel, BaseModel):
     price = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
     amount = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
     fee = models.DecimalField(max_digits=20, decimal_places=8, null=True)
+    fee_currency = models.ForeignKey('exchange_core.Currencies', related_name='orders', on_delete=models.CASCADE, null=True)
     type = models.CharField(max_length=1, choices=TYPES)
     status = models.CharField(max_length=30, choices=STATUS, default=STATUS.created)
     executed_at = models.DateTimeField(null=True)
