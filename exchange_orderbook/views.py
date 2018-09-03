@@ -177,7 +177,7 @@ class CreateOrderView(View):
             compare_account.save()
 
             # Com tudo certo, salva a order no banco
-            order.currency = compare_account.currency
+            order.fee_currency = compare_account.currency
             order.save()
 
             return {'order': order.pk}
