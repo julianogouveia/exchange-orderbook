@@ -35,7 +35,7 @@ msgid "Market"
 msgstr "Mercado"
 
 #: models.py:31 templates/orderbook/orders.html:143
-msgid "Markets"
+msgid "CurrencyPairs"
 msgstr "Mercados"
 
 #: models.py:54 templates/orderbook/orders.html:44

@@ -2,19 +2,19 @@ from decimal import Decimal
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from exchange_orderbook.models import Orders, Markets
+from exchange_orderbook.models import Orders, CurrencyPairs
 
 
 class OrderForm(forms.ModelForm):
 	class Meta:
 		model = Orders
-		fields = ('market', 'price', 'amount', 'type',)
+		fields = ('currency_pair', 'price', 'amount', 'side',)
 
 	def clean_price(self):
-		market = self.cleaned_data['market']
+		market = self.cleaned_data['currency_pair']
 		price = self.cleaned_data['price']
 
-		if not isinstance(market, Markets):
+		if not isinstance(market, CurrencyPairs):
 			raise forms.ValidationError(_("Invalid market selected"))
 
 		if market.min_price > price:

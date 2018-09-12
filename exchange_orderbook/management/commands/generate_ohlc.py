@@ -3,7 +3,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from django.core.management.base import BaseCommand
-from exchange_orderbook.models import OHLC, Markets, Orders
+from exchange_orderbook.models import OHLC, CurrencyPairs, Orders
 
 def daterange(start_date, end_date):
     for n in range(int ((end_date - start_date).days)):
@@ -15,7 +15,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         while True:
-            markets = Markets.objects.all()
+            markets = CurrencyPairs.objects.all()
 
             for market in markets:
                 orders = Orders.objects.filter(status=Orders.STATUS.executed, modified__date__lt=timezone.now(), market=market, type=Orders.TYPES.s).order_by('created')

@@ -1034,7 +1034,7 @@ function menuOnOut() {
         // Change cursor on the point/plotting area:
         chart.container.classList.toggle(
             'crosshair-on-point',
-            // Annotation type changed
+            // Annotation side changed
             H.Annotation[annotating] !== annotation &&
             // Annotation on click action
             H.defined(H.Annotation[annotating].onPointClick)

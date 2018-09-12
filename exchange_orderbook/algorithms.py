@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 from exchange_core.models import Accounts
 from exchange_core.utils import close_db_connection
-from exchange_orderbook.models import Orders, Matchs, Markets
+from exchange_orderbook.models import Orders, Matchs, CurrencyPairs
 
 """
  https://stackoverflow.com/questions/13112062/which-are-the-order-matching-algorithms-most-commonly-used-by-electronic-financi
@@ -60,10 +60,10 @@ class FIFO:
         b_passive_account.save()
 
         match = Matchs()
-        match.active_fee = self.get_fee(active_amount, 'active')
-        match.passive_fee = self.get_fee(passive_amount, 'passive')
-        match.active_order = active_order
-        match.passive_order = passive_order
+        match.taker_fee = self.get_fee(active_amount, 'active')
+        match.maker_fee = self.get_fee(passive_amount, 'passive')
+        match.taker_order = active_order
+        match.maker_order = passive_order
         match.save()
 
         # Give back the amount to user
@@ -151,8 +151,8 @@ class FIFO:
     @close_db_connection
     def execute(self, market):
         with transaction.atomic():
-            ask_orders = Orders.objects.filter(type=Orders.TYPES.s, status=Orders.STATUS.created, market=market).order_by('price', 'created')
-            bid_orders = Orders.objects.filter(type=Orders.TYPES.b, status=Orders.STATUS.created, market=market).order_by('-price', 'created')
+            ask_orders = Orders.objects.filter(type=Orders.SIDES.s, status=Orders.STATUS.created, market=market).order_by('price', 'created')
+            bid_orders = Orders.objects.filter(type=Orders.SIDES.b, status=Orders.STATUS.created, market=market).order_by('-price', 'created')
 
             # Stops function execution if one of match queues are empty
             if not ask_orders or not bid_orders:
@@ -184,4 +184,4 @@ class FIFO:
 
     def spawn(self):
         gevent.wait([gevent.spawn(self.execute, market)
-                     for market in Markets.objects.all()])
+                     for market in CurrencyPairs.objects.all()])
