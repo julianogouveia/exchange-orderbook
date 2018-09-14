@@ -9,16 +9,15 @@ from exchange_orderbook.choices import SIDE_CHOICES, STATE_CHOICES, CREATED_STAT
 
 
 class BaseCurrencies(TimeStampedModel, BaseModel):
-    currency = models.OneToOneField('exchange_core.Currencies', related_name='base_currencies',
-                                    on_delete=models.CASCADE)
+    currency = models.OneToOneField('exchange_core.Currencies', related_name='base_currencies', on_delete=models.CASCADE)
     order = models.IntegerField(default=100)
 
     def __str__(self):
         return self.currency.name
 
     class Meta:
-        verbose_name = _("Market")
-        verbose_name_plural = _("CurrencyPairs")
+        verbose_name = _("Currency Pair")
+        verbose_name_plural = _("Currency Pairs")
 
 
 class CurrencyPairs(TimeStampedModel, BaseModel):
@@ -36,7 +35,7 @@ class CurrencyPairs(TimeStampedModel, BaseModel):
 
 
 class Orders(TimeStampedModel, BaseModel):
-    currency_pair = models.ForeignKey(CurrencyPairs, related_name='orders', on_delete=models.CASCADE, verbose_name=_("Pair"))
+    currency_pair = models.ForeignKey(CurrencyPairs, related_name='orders', on_delete=models.CASCADE, verbose_name=_("Currency Pair"))
     user = models.ForeignKey('exchange_core.Users', related_name='orders', on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
     amount = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
@@ -61,20 +60,11 @@ class Orders(TimeStampedModel, BaseModel):
 
 
 class Matchs(TimeStampedModel, BaseModel):
-    taker_order = models.OneToOneField(Orders, related_name='taker_matchs', on_delete=models.CASCADE)
+    taker_order = models.OneToOneField(Orders, related_name='active_orders', on_delete=models.CASCADE)
     taker_fee = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
-    maker_order = models.OneToOneField(Orders, related_name='maker_matchs', on_delete=models.CASCADE)
+    maker_order = models.OneToOneField(Orders, related_name='passive_orders', on_delete=models.CASCADE)
     maker_fee = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
 
     class Meta:
         verbose_name = _("Match")
         verbose_name_plural = _("Matchs")
-
-
-class OHLC(BaseModel):
-    market = models.ForeignKey(CurrencyPairs, related_name='ohlc', on_delete=models.CASCADE)
-    timestamp = models.DateField()
-    open = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
-    high = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
-    low = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
-    close = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
