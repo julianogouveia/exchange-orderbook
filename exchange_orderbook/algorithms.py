@@ -5,6 +5,7 @@ from django.utils import timezone
 from exchange_core.models import Accounts
 from exchange_core.utils import close_db_connection
 from exchange_orderbook.models import Orders, Matchs, CurrencyPairs
+from exchange_orderbook.choices import CREATED_STATE, EXECUTED_STATE, ASK_SIDE, BID_SIDE
 
 """
  https://stackoverflow.com/questions/13112062/which-are-the-order-matching-algorithms-most-commonly-used-by-electronic-financi
@@ -12,6 +13,10 @@ from exchange_orderbook.models import Orders, Matchs, CurrencyPairs
  https://www.cmegroup.com/confluence/display/EPICSANDBOX/Matching+Algorithms
  https://www.zerohedge.com/news/2014-04-19/timestamp-fraud-rigged-market-explained-one-simple-animation
 """
+
+
+MAKER_TYPE = 'active'
+TAKER_TYPE = 'passive'
 
 
 # This proccess a order using the FIFO continuous trading algorithm
@@ -23,21 +28,20 @@ class FIFO:
         return [active_account, passive_account]
 
     def get_fee(self, amount, type):
-        if type == 'active':
+        if type == MAKER_TYPE:
             return amount * settings.INTERMEDIATION_ACTIVE_FEE
-        elif type == 'passive':
+        elif type == TAKER_TYPE:
             return amount * settings.INTERMEDIATION_PASSIVE_FEE
 
-    def negotiate(self, bid, ask, bid_amount, ask_amount, a_active_account, b_active_account, a_passive_account,
-                  b_passive_account, give_back=None):
-        # Faz a distincao entre order ativa e passsiva, a order ativa e sempre a order mais recente, pois ela deu origem a operacao
+    def trade(self, bid, ask, bid_amount, ask_amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=None):
+        # Makes the distinction between maker active order and passive order
         if bid.created > ask.created:
             active_order = bid
             passive_order = ask
             active_amount = bid_amount
             passive_amount = ask_amount
-            bid_fee = self.get_fee(bid_amount, 'active')
-            ask_fee = self.get_fee(ask_amount, 'passive')
+            bid_fee = self.get_fee(bid_amount, TAKER_TYPE)
+            ask_fee = self.get_fee(ask_amount, MAKER_TYPE)
             bid_amount_with_fee = bid_amount - bid_fee
             ask_amount_with_fee = ask_amount - ask_fee
         else:
@@ -45,8 +49,8 @@ class FIFO:
             passive_order = bid
             active_amount = ask_amount
             passive_amount = bid_amount
-            bid_fee = self.get_fee(bid_amount, 'passive')
-            ask_fee = self.get_fee(ask_amount, 'active')
+            bid_fee = self.get_fee(bid_amount, MAKER_TYPE)
+            ask_fee = self.get_fee(ask_amount, TAKER_TYPE)
             bid_amount_with_fee = bid_amount - bid_fee
             ask_amount_with_fee = ask_amount - ask_fee
 
@@ -54,14 +58,15 @@ class FIFO:
         b_active_account.save()
         a_active_account.deposit += bid_amount_with_fee
         a_active_account.save()
+
         a_passive_account.reserved -= ask_amount
         a_passive_account.save()
         b_passive_account.deposit += ask_amount_with_fee
         b_passive_account.save()
 
         match = Matchs()
-        match.taker_fee = self.get_fee(active_amount, 'active')
-        match.maker_fee = self.get_fee(passive_amount, 'passive')
+        match.taker_fee = self.get_fee(active_amount, TAKER_TYPE)
+        match.maker_fee = self.get_fee(passive_amount, MAKER_TYPE)
         match.taker_order = active_order
         match.maker_order = passive_order
         match.save()
@@ -75,9 +80,9 @@ class FIFO:
         return (bid_fee, ask_fee)
 
     def finish_order(self, order, fee=None):
-        order.status = Orders.STATUS.executed
+        order.state = EXECUTED_STATE
         order.fee = fee
-        order.executed_at = timezone.now()
+        order.executed = timezone.now()
         order.save()
         return order
 
@@ -94,8 +99,8 @@ class FIFO:
             bid_total = ask.amount * ask.price
             give_back = abs((bid.price * ask.amount) - (ask.price * ask.amount)) if ask.price < bid.price else None
 
-            bid_fee, ask_fee = self.negotiate(bid, ask, bid_total, ask.amount, a_active_account, b_active_account,
-                                              a_passive_account, b_passive_account, give_back=give_back)
+            bid_fee, ask_fee = self.trade(bid, ask, bid_total, ask.amount, a_active_account, b_active_account,
+                                          a_passive_account, b_passive_account, give_back=give_back)
             self.finish_order(ask, ask_fee)
 
             # Take out the amount and save the order
@@ -112,15 +117,15 @@ class FIFO:
             bid.pk = None
             bid.price = original_bid_price
             bid.amount = original_bid_amount - ask.amount
-            bid.status = Orders.STATUS.created
+            bid.state = CREATED_STATE
             bid.save()
 
         elif ask.amount > bid.amount:
             bid_total = bid.amount * ask.price
             give_back = abs((bid.price * bid.amount) - (ask.price * bid.amount)) if ask.price < bid.price else None
 
-            bid_fee, ask_fee = self.negotiate(bid, ask, bid_total, bid.amount, a_active_account, b_active_account,
-                                              a_passive_account, b_passive_account, give_back=give_back)
+            bid_fee, ask_fee = self.trade(bid, ask, bid_total, bid.amount, a_active_account, b_active_account,
+                                          a_passive_account, b_passive_account, give_back=give_back)
             self.finish_order(bid, bid_fee)
 
             # Take out the amount and save the order
@@ -134,25 +139,23 @@ class FIFO:
             # Reset object to create a new one
             ask.pk = None
             ask.amount = original_ask_amount - bid.amount
-            ask.status = Orders.STATUS.created
+            ask.state = CREATED_STATE
             ask.save()
 
         elif ask.amount == bid.amount:
             bid_total = bid.amount * ask.price
             give_back = abs((bid.price * bid.amount) - (ask.price * bid.amount)) if ask.price < bid.price else None
+            bid_fee, ask_fee = self.trade(bid, ask, bid_total, ask.amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=give_back)
 
-            bid_fee, ask_fee = self.negotiate(bid, ask, bid_total, ask.amount, a_active_account, b_active_account,
-                                              a_passive_account, b_passive_account, give_back=give_back)
             self.finish_order(ask, ask_fee)
-
             self.finish_order(bid, bid_fee)
             self.save_bid_price(bid, ask)
 
     @close_db_connection
     def execute(self, market):
         with transaction.atomic():
-            ask_orders = Orders.objects.filter(type=Orders.SIDES.s, status=Orders.STATUS.created, market=market).order_by('price', 'created')
-            bid_orders = Orders.objects.filter(type=Orders.SIDES.b, status=Orders.STATUS.created, market=market).order_by('-price', 'created')
+            ask_orders = Orders.objects.filter(type=ASK_SIDE, status=CREATED_STATE, market=market).order_by('price', 'created')
+            bid_orders = Orders.objects.filter(type=BID_SIDE, status=CREATED_STATE, market=market).order_by('-price', 'created')
 
             # Stops function execution if one of match queues are empty
             if not ask_orders or not bid_orders:
@@ -183,5 +186,4 @@ class FIFO:
                 self.do_exchange(high_bid, high_ask)
 
     def spawn(self):
-        gevent.wait([gevent.spawn(self.execute, market)
-                     for market in CurrencyPairs.objects.all()])
+        gevent.wait([gevent.spawn(self.execute, market) for market in CurrencyPairs.objects.all()])

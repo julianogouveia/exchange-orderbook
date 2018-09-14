@@ -43,7 +43,7 @@ class Orders(TimeStampedModel, BaseModel):
     fee_currency = models.ForeignKey('exchange_core.Currencies', related_name='orders', on_delete=models.CASCADE, null=True)
     side = models.CharField(max_length=1, choices=SIDE_CHOICES)
     state = models.CharField(max_length=30, choices=STATE_CHOICES, default=CREATED_STATE)
-    executed_at = models.DateTimeField(null=True)
+    executed = models.DateTimeField(null=True)
 
     class Meta:
         verbose_name = _("Order")

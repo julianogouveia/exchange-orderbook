@@ -22,8 +22,8 @@ class TradesAdmin(BaseAdmin):
 
 @admin.register(Orders)
 class OrdersAdmin(BaseAdmin):
-    list_display = ('user', 'currency_pair', 'get_amount', 'get_price', 'fee', 'get_side', 'state', 'executed_at', 'created', 'modified',)
-    readonly_fields = ('currency_pair', 'user', 'side', 'state', 'executed_at')
+    list_display = ('user', 'currency_pair', 'get_amount', 'get_price', 'fee', 'get_side', 'state', 'executed', 'created', 'modified',)
+    readonly_fields = ('currency_pair', 'user', 'side', 'state', 'executed')
     list_select_related = ('currency_pair',)
 
     def get_amount(self, o):
