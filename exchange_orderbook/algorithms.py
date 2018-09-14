@@ -12,6 +12,9 @@ from exchange_orderbook.choices import CREATED_STATE, EXECUTED_STATE, ASK_SIDE, 
  http://people.hss.caltech.edu/~pbs/fm/chunks/ch10.html
  https://www.cmegroup.com/confluence/display/EPICSANDBOX/Matching+Algorithms
  https://www.zerohedge.com/news/2014-04-19/timestamp-fraud-rigged-market-explained-one-simple-animation
+ https://www.investopedia.com/terms/i/isocurrencycode.asp
+ https://www.investopedia.com/terms/b/basecurrency.asp
+ https://www.investopedia.com/terms/q/quotecurrency.asp
 """
 
 
