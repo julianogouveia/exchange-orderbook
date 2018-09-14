@@ -66,7 +66,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='orders',
             name='side',
-            field=models.CharField(choices=[('bid', 'Bid'), ('ask', 'Ask')], max_length=1, null=True),
+            field=models.CharField(choices=[('bid', 'Bid'), ('ask', 'Ask')], max_length=1),
         ),
         migrations.RenameField(
             model_name='orders',

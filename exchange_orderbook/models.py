@@ -48,23 +48,24 @@ class Orders(TimeStampedModel, BaseModel):
     class Meta:
         verbose_name = _("Order")
         verbose_name_plural = _("Orders")
+        ordering = ['-created']
 
     def __str__(self):
         return '{} | {} - {} | {} - {}'.format(self.side, self.price,
                                                self.currency_pair.base_currency.currency.code,
-                                               self.amount, self.currency_pair.currency.code)
+                                               self.amount, self.currency_pair.quote_currency.code)
 
     @property
     def total(self):
-        ordering = ['-created']
+        return self.price * self.amount
 
 
-class Matchs(TimeStampedModel, BaseModel):
-    taker_order = models.OneToOneField(Orders, related_name='active_orders', on_delete=models.CASCADE)
+class Trades(TimeStampedModel, BaseModel):
+    taker_order = models.OneToOneField(Orders, related_name='taker_orders', on_delete=models.CASCADE)
     taker_fee = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
-    maker_order = models.OneToOneField(Orders, related_name='passive_orders', on_delete=models.CASCADE)
+    maker_order = models.OneToOneField(Orders, related_name='maker_orders', on_delete=models.CASCADE)
     maker_fee = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
 
     class Meta:
-        verbose_name = _("Match")
-        verbose_name_plural = _("Matchs")
+        verbose_name = _("Trade")
+        verbose_name_plural = _("Trades")

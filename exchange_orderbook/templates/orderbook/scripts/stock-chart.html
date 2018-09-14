@@ -2811,7 +2811,7 @@ window.onload = function () {
         highchartsReset.addEventListener('click', function () {
             if (confirm('Are you sure you want to clear the chart?')) {
                 Highcharts.ajax({
-                    url: '{% url "orderbook>ohlc" %}',
+                    url: '',
                     dataType: 'text',
                     success: function (data) {
                         var chart = Highcharts.getChartById('container-inner');
@@ -2868,7 +2868,7 @@ window.onload = function () {
         );
     } else {
         Highcharts.ajax({
-            url: '{% url "orderbook>ohlc" %}',
+            url: '',
             dataType: 'text',
             success: function (data) {
                 data = data.replace(/\/\*.*\*\//g, '');
