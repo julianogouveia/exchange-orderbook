@@ -8,7 +8,7 @@ from exchange_orderbook.models import Orders, CurrencyPairs
 class OrderForm(forms.ModelForm):
 	class Meta:
 		model = Orders
-		fields = ('currency_pair', 'price', 'amount', 'side',)
+		fields = ('currency_pair', 'price', 'qty', 'side',)
 
 	def clean_price(self):
 		market = self.cleaned_data['currency_pair']

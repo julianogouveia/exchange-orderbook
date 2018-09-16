@@ -28,7 +28,7 @@ class OrdersView(TemplateView):
         for base_currency in BaseCurrencies.objects.order_by('order'):
             context['base_currencies'].append({
                 'pk': base_currency.pk,
-                'symbol': base_currency.currency.symbol
+                'symbol': base_currency.currency.code
             })
 
         return context
@@ -39,20 +39,20 @@ class UpdateBaseCurrencyView(View):
     def post(self, request):
         user = request.user
 
-        if BaseCurrencies.objects.filter(currency__symbol=request.POST['symbol']).exists():
-            symbol = request.POST['symbol']
-            user.profile[settings.ORDERBOOK_BASE_CURRENCY_SESSION_NAME] = symbol
-            market_session_name = settings.ORDERBOOK_MARKET_SESSION_NAME + '_' + symbol
+        if BaseCurrencies.objects.filter(currency__code=request.POST['symbol']).exists():
+            code = request.POST['symbol']
+            user.profile[settings.ORDERBOOK_BASE_CURRENCY_SESSION_NAME] = code
+            market_session_name = settings.ORDERBOOK_MARKET_SESSION_NAME + '_' + code
 
             if not market_session_name in user.profile:
                 user.profile[market_session_name] = CurrencyPairs.objects.filter(
-                    base_currency__currency__symbol=symbol).first().pk
+                    base_currency__currency__code=code).first().pk
 
             user.save()
 
             market = CurrencyPairs.objects.get(pk=user.profile[market_session_name])
 
-            return {'base_currency': symbol, 'market_currency': market.currency.symbol, 'market_pk': market.pk}
+            return {'base_currency': code, 'market_currency': market.quote_currency.code, 'market_pk': market.pk}
 
         return {'status': 'error'}
 
@@ -61,14 +61,14 @@ class UpdateBaseCurrencyView(View):
 class UpdateMarketCurrencyView(View):
     def post(self, request):
         user = request.user
-        market_symbol = request.POST['symbol']
+        market_code = request.POST['symbol']
         base_currency = user.profile[settings.ORDERBOOK_BASE_CURRENCY_SESSION_NAME]
         market_session_name = settings.ORDERBOOK_MARKET_SESSION_NAME + '_' + base_currency
-        market = CurrencyPairs.objects.get(base_currency__currency__symbol=base_currency, currency__symbol=market_symbol)
+        market = CurrencyPairs.objects.get(base_currency__currency__code=base_currency, quote_currency__code=market_code)
         user.profile[market_session_name] = market.pk
         user.save()
 
-        return {'market_currency': market.currency.symbol, 'market_pk': market.pk}
+        return {'market_currency': market.quote_currency.code, 'market_pk': market.pk}
 
 
 @method_decorator([login_required, json_view], name='dispatch')
@@ -79,7 +79,7 @@ class MyBaseCurrencyView(View):
         if settings.ORDERBOOK_BASE_CURRENCY_SESSION_NAME in user.profile:
             base_currency = user.profile[settings.ORDERBOOK_BASE_CURRENCY_SESSION_NAME]
         else:
-            base_currency = BaseCurrencies.objects.first().currency.symbol
+            base_currency = BaseCurrencies.objects.first().quote_currency.code
             user.profile[settings.ORDERBOOK_BASE_CURRENCY_SESSION_NAME] = base_currency
             user.save()
 
@@ -88,19 +88,18 @@ class MyBaseCurrencyView(View):
         if market_session_name in user.profile:
             market_currency = request.user.profile[market_session_name]
         else:
-            market_currency = CurrencyPairs.objects.filter(base_currency__currency__symbol=base_currency).first().pk
+            market_currency = CurrencyPairs.objects.filter(base_currency__currency__code=base_currency).first().pk
             user.profile[market_session_name] = market_currency
             user.save()
 
-        market = CurrencyPairs.objects.get(pk=user.profile[market_session_name])
-
-        return {'base_currency': base_currency, 'market_currency': market.currency.symbol, 'market_pk': market.pk}
+        currency_pair = CurrencyPairs.objects.get(pk=user.profile[market_session_name])
+        return {'base_currency': base_currency, 'market_currency': currency_pair.quote_currency.code, 'market_pk': currency_pair.pk}
 
 
 @method_decorator([login_required, json_view], name='dispatch')
 class MarketsView(View):
     def get(self, request):
-        base_currency = BaseCurrencies.objects.get(currency__symbol=request.GET['base_currency'])
+        base_currency = BaseCurrencies.objects.get(currency__code=request.GET['base_currency'])
         markets = []
 
         for market in CurrencyPairs.objects.filter(base_currency=base_currency):
@@ -113,14 +112,14 @@ class MarketsView(View):
             _24_hours_ago = timezone.now() - timedelta(hours=24)
             v_aggregate = Orders.objects.select_related('market__base_currency__currency', 'market__currency')\
                 .filter(type=Orders.SIDES.s, status=Orders.STATUS.executed, market=market, created__gte=_24_hours_ago)\
-                .aggregate(volume=Sum(F('price') * F('amount')))
+                .aggregate(volume=Sum(F('price') * F('qty')))
             volume = round(v_aggregate['volume'] or Decimal('0.00'), 8)
 
             markets.append({
                 'pk': market.pk,
-                'base_currency': market.base_currency.currency.symbol,
+                'base_currency': market.base_currency.currency.code,
                 'name': market.quote_currency.name,
-                'currency': market.quote_currency.symbol,
+                'currency': market.quote_currency.code,
                 'min_price': market.min_price,
                 'max_price': market.max_price,
                 'price': '{:8f}'.format(price),
@@ -195,7 +194,7 @@ class BaseOrdersView(View):
         if settings.ORDERBOOK_BASE_CURRENCY_SESSION_NAME in request.user.profile:
             base_currency = request.user.profile[settings.ORDERBOOK_BASE_CURRENCY_SESSION_NAME]
         else:
-            base_currency = BaseCurrencies.objects.first().currency.symbol
+            base_currency = BaseCurrencies.objects.first().currency.code
 
         market_session_name = settings.ORDERBOOK_MARKET_SESSION_NAME + '_' + base_currency
         market_pk = request.user.profile[market_session_name]
@@ -218,11 +217,11 @@ class BaseOrdersView(View):
                 'pk': order.pk,
                 'side': order.type_name,
                 'updated': order.modified,
-                'price_currency': market.base_currency.currency.symbol,
+                'price_currency': market.base_currency.currency.code,
                 'price': '{:8f}'.format(order.price),
-                'amount_currency': market.currency.symbol,
+                'amount_currency': market.quote_currency.code,
                 'amount': '{:8f}'.format(order.amount),
-                'total': '{:8f}'.format(round(order.total, 8)),
+                'amount': '{:8f}'.format(round(order.amount, 8)),
                 'is_mine': request.user.pk == order.user.pk
             })
 
@@ -232,7 +231,7 @@ class BaseOrdersView(View):
 @method_decorator([login_required, json_view], name='dispatch')
 class GetAvailableBalanceView(View):
     def post(self, request):
-        currency = Currencies.objects.get(symbol=request.POST['symbol'])
+        currency = Currencies.objects.get(code=request.POST['symbol'])
         account = Accounts.objects.get(user=request.user, currency=currency)
         return {'available_balance': '{:8f}'.format(account.deposit)}
 
@@ -253,8 +252,8 @@ class CancelMyOrderView(View):
                 account.save()
             elif order.type == Orders.SIDES.b:
                 account = Accounts.objects.get(user=request.user, currency=order.market.base_currency.currency)
-                account.reserved -= order.total
-                account.deposit += order.total
+                account.reserved -= order.amount
+                account.deposit += order.amount
                 account.save()
 
         return {'message': _("Your order has been canceled")}

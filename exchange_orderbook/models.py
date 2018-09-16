@@ -9,8 +9,8 @@ from exchange_orderbook.choices import SIDE_CHOICES, STATE_CHOICES, CREATED_STAT
 
 
 class BaseCurrencies(TimeStampedModel, BaseModel):
-    currency = models.OneToOneField('exchange_core.Currencies', related_name='base_currencies', on_delete=models.CASCADE)
-    order = models.IntegerField(default=100)
+    currency = models.OneToOneField('exchange_core.Currencies', related_name='base_currencies', on_delete=models.CASCADE, verbose_name=_("Currency"))
+    order = models.IntegerField(default=100, verbose_name=_("Order"), help_text=_("The order who base currency must appears in Orderbook"))
 
     def __str__(self):
         return self.currency.name
@@ -21,10 +21,12 @@ class BaseCurrencies(TimeStampedModel, BaseModel):
 
 
 class CurrencyPairs(TimeStampedModel, BaseModel):
-    base_currency = models.ForeignKey(BaseCurrencies, related_name='currency_pairs', on_delete=models.CASCADE)
-    quote_currency = models.ForeignKey('exchange_core.Currencies', related_name='currency_pairs', on_delete=models.CASCADE)
-    min_price = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
-    max_price = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('1000000.00'))
+    base_currency = models.ForeignKey(BaseCurrencies, related_name='currency_pairs', on_delete=models.CASCADE, verbose_name=_("Base currency"))
+    quote_currency = models.ForeignKey('exchange_core.Currencies', related_name='currency_pairs', on_delete=models.CASCADE, verbose_name=_("Quote currency"))
+    min_price = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'), verbose_name=_("Min price"))
+    max_price = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('1000000.00'), verbose_name=_("Max price"))
+    min_qty = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'), verbose_name=_("Min quantity"))
+    max_qty = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('1000000.00'), verbose_name=_("Max quantity"))
 
     def __str__(self):
         return '{}/{}'.format(self.base_currency.currency.code, self.quote_currency.code)
@@ -36,14 +38,14 @@ class CurrencyPairs(TimeStampedModel, BaseModel):
 
 class Orders(TimeStampedModel, BaseModel):
     currency_pair = models.ForeignKey(CurrencyPairs, related_name='orders', on_delete=models.CASCADE, verbose_name=_("Currency Pair"))
-    user = models.ForeignKey('exchange_core.Users', related_name='orders', on_delete=models.CASCADE)
-    price = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
-    amount = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'))
-    fee = models.DecimalField(max_digits=20, decimal_places=8, null=True)
-    fee_currency = models.ForeignKey('exchange_core.Currencies', related_name='orders', on_delete=models.CASCADE, null=True)
-    side = models.CharField(max_length=1, choices=SIDE_CHOICES)
-    state = models.CharField(max_length=30, choices=STATE_CHOICES, default=CREATED_STATE)
-    executed = models.DateTimeField(null=True)
+    user = models.ForeignKey('exchange_core.Users', related_name='orders', on_delete=models.CASCADE, verbose_name=_("User"))
+    price = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'), verbose_name=_("Price"))
+    qty = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'), verbose_name=_("Quantity"))
+    fee = models.DecimalField(max_digits=20, decimal_places=8, null=True, verbose_name=_("Fee"))
+    fee_currency = models.ForeignKey('exchange_core.Currencies', related_name='orders', on_delete=models.CASCADE, null=True, verbose_name=_("Fee currency"))
+    side = models.CharField(max_length=1, choices=SIDE_CHOICES, verbose_name=_("Side"))
+    state = models.CharField(max_length=30, choices=STATE_CHOICES, default=CREATED_STATE, verbose_name=_("State"))
+    executed = models.DateTimeField(null=True, verbose_name=_("Executed date"))
 
     class Meta:
         verbose_name = _("Order")
@@ -53,11 +55,11 @@ class Orders(TimeStampedModel, BaseModel):
     def __str__(self):
         return '{} | {} - {} | {} - {}'.format(self.side, self.price,
                                                self.currency_pair.base_currency.currency.code,
-                                               self.amount, self.currency_pair.quote_currency.code)
+                                               self.qty, self.currency_pair.quote_currency.code)
 
     @property
-    def total(self):
-        return self.price * self.amount
+    def amount(self):
+        return self.price * self.qty
 
 
 class Trades(TimeStampedModel, BaseModel):
