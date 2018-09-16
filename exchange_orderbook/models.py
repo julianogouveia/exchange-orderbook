@@ -16,8 +16,8 @@ class BaseCurrencies(TimeStampedModel, BaseModel):
         return self.currency.name
 
     class Meta:
-        verbose_name = _("Currency Pair")
-        verbose_name_plural = _("Currency Pairs")
+        verbose_name = _("Base currency")
+        verbose_name_plural = _("Base currencies")
 
 
 class CurrencyPairs(TimeStampedModel, BaseModel):
@@ -32,12 +32,12 @@ class CurrencyPairs(TimeStampedModel, BaseModel):
         return '{}/{}'.format(self.base_currency.currency.code, self.quote_currency.code)
 
     class Meta:
-        verbose_name = _("Pair")
-        verbose_name_plural = _("Pairs")
+        verbose_name = _("Currency pair")
+        verbose_name_plural = _("Currency pairs")
 
 
 class Orders(TimeStampedModel, BaseModel):
-    currency_pair = models.ForeignKey(CurrencyPairs, related_name='orders', on_delete=models.CASCADE, verbose_name=_("Currency Pair"))
+    currency_pair = models.ForeignKey(CurrencyPairs, related_name='orders', on_delete=models.CASCADE, verbose_name=_("Currency pair"))
     user = models.ForeignKey('exchange_core.Users', related_name='orders', on_delete=models.CASCADE, verbose_name=_("User"))
     price = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'), verbose_name=_("Price"))
     qty = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'), verbose_name=_("Quantity"))
@@ -45,7 +45,7 @@ class Orders(TimeStampedModel, BaseModel):
     fee_currency = models.ForeignKey('exchange_core.Currencies', related_name='orders', on_delete=models.CASCADE, null=True, verbose_name=_("Fee currency"))
     side = models.CharField(max_length=1, choices=SIDE_CHOICES, verbose_name=_("Side"))
     state = models.CharField(max_length=30, choices=STATE_CHOICES, default=CREATED_STATE, verbose_name=_("State"))
-    executed = models.DateTimeField(null=True, verbose_name=_("Executed date"))
+    executed = models.DateTimeField(null=True, verbose_name=_("Executed"))
 
     class Meta:
         verbose_name = _("Order")

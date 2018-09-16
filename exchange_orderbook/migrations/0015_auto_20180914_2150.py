@@ -11,7 +11,6 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('exchange_core', '0003_auto_20180901_1752'),
         ('exchange_orderbook', '0014_orders_fee_currency'),
     ]
 
