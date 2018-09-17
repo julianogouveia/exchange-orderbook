@@ -12,7 +12,7 @@ class BaseCurrenciesAdmin(admin.ModelAdmin):
 
 @admin.register(CurrencyPairs)
 class CurrencyPairsAdmin(BaseAdmin):
-    list_display = ('base_currency', 'quote_currency', 'min_price', 'max_price',)
+    list_display = ('base_currency', 'quote_currency', 'min_price', 'max_price', 'min_qty', 'max_qty',)
 
 
 @admin.register(Trades)
