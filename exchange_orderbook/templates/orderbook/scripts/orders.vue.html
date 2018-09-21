@@ -6,7 +6,7 @@
 			return {
 				data: {
 					price: null,
-					amount: null,
+					qty: null,
 					queue_position: 0,
 					base_currency: null,
 					market_currency: null,
@@ -21,9 +21,9 @@
 
 						var data = {
 							price: this.price,
-							amount: this.amount,
-							market: this.market_pk,
-							type: type
+							qty: this.qty,
+							currency_pair: this.market_pk,
+							side: type
 						};
 
 						var vm = this;
@@ -34,7 +34,7 @@
 							if (response.order) {
 								swal('{% trans "Success!" %}', '{% trans "Your order has been created." %}', 'success').then(function() {
 									vm.price = null;
-									vm.amount = null;
+									vm.qty = null;
 								});
 							}
 							else if (response.error) {
@@ -74,7 +74,7 @@
 				},
 				computed: {
 					total: function() {
-						return (this.price * this.amount).toFixed(8);
+						return (this.price * this.qty).toFixed(8);
 					}
 				}
 			};
@@ -118,7 +118,7 @@
 				},
 				populate_order: function(item) {
 					new_s_order_app.price = item.price;
-					new_s_order_app.amount = item.amount;
+					new_s_order_app.qty = item.qty;
 				},
 				cancel_order: function(pk) {
 					if (confirm('{% trans "Are you sure you want delete this order?" %}')) {
@@ -168,7 +168,7 @@
 				},
 				populate_order: function(item) {
 					new_b_order_app.price = item.price;
-					new_b_order_app.amount = item.amount;
+					new_b_order_app.qty = item.qty;
 				}
 			}
 		});

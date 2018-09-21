@@ -12,7 +12,7 @@ urlpatterns = [
     path('orderbook/get-available-balance', views.GetAvailableBalanceView.as_view(), name='orderbook>get-available-balance'),
     path('orderbook/cancel-my-order', views.CancelMyOrderView.as_view(), name='orderbook>cancel-my-order-view'),
     path('orderbook/create-order', views.CreateOrderView.as_view(), name='orderbook>create-order'),
-    path('orderbook/buy-orders', views.BuyOrdersView.as_view(), name='orderbook>buy-orders'),
-    path('orderbook/sell-orders', views.SellOrdersView.as_view(), name='orderbook>sell-orders'),
+    path('orderbook/buy-orders', views.BidOrdersView.as_view(), name='orderbook>buy-orders'),
+    path('orderbook/sell-orders', views.AskOrdersView.as_view(), name='orderbook>sell-orders'),
     path('orderbook/executed-orders', views.ExecutedOrdersView.as_view(), name='orderbook>executed-orders'),
 ]

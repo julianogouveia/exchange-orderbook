@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 from exchange_core.models import Accounts
 from exchange_core.utils import close_db_connection
-from exchange_orderbook.models import Orders, Matchs, CurrencyPairs
+from exchange_orderbook.models import Orders, Trades, CurrencyPairs
 from exchange_orderbook.choices import CREATED_STATE, EXECUTED_STATE, ASK_SIDE, BID_SIDE
 
 """
@@ -25,9 +25,8 @@ TAKER_TYPE = 'passive'
 # This proccess a order using the FIFO continuous trading algorithm
 class FIFO:
     def get_accounts(self, order):
-        active_account = Accounts.objects.get(user_id=order.user_id,
-                                              currency__id=order.market.base_currency.currency_id)
-        passive_account = Accounts.objects.get(user_id=order.user_id, currency__id=order.market.currency_id)
+        active_account = Accounts.objects.get(user_id=order.user_id, currency__id=order.currency_pair.base_currency.currency_id)
+        passive_account = Accounts.objects.get(user_id=order.user_id, currency__id=order.currency_pair.quote_currency_id)
         return [active_account, passive_account]
 
     def get_fee(self, amount, type):
@@ -67,12 +66,12 @@ class FIFO:
         b_passive_account.deposit += ask_amount_with_fee
         b_passive_account.save()
 
-        match = Matchs()
-        match.taker_fee = self.get_fee(active_amount, TAKER_TYPE)
-        match.maker_fee = self.get_fee(passive_amount, MAKER_TYPE)
-        match.taker_order = active_order
-        match.maker_order = passive_order
-        match.save()
+        trade = Trades()
+        trade.taker_fee = self.get_fee(active_amount, TAKER_TYPE)
+        trade.maker_fee = self.get_fee(passive_amount, MAKER_TYPE)
+        trade.taker_order = active_order
+        trade.maker_order = passive_order
+        trade.save()
 
         # Give back the amount to user
         if give_back:
@@ -155,10 +154,10 @@ class FIFO:
             self.save_bid_price(bid, ask)
 
     @close_db_connection
-    def execute(self, market):
+    def execute(self, currency_pair):
         with transaction.atomic():
-            ask_orders = Orders.objects.filter(type=ASK_SIDE, status=CREATED_STATE, market=market).order_by('price', 'created')
-            bid_orders = Orders.objects.filter(type=BID_SIDE, status=CREATED_STATE, market=market).order_by('-price', 'created')
+            ask_orders = Orders.objects.filter(side=ASK_SIDE, state=CREATED_STATE, currency_pair=currency_pair).order_by('price', 'created')
+            bid_orders = Orders.objects.filter(side=BID_SIDE, state=CREATED_STATE, currency_pair=currency_pair).order_by('-price', 'created')
 
             # Stops function execution if one of match queues are empty
             if not ask_orders or not bid_orders:
@@ -175,7 +174,7 @@ class FIFO:
                 if high_ask.user_id == high_bid.user_id and not settings.ALLOW_SAME_USER_ORDER_MATCH:
                     continue
 
-                # Stops function execution if there is no market price match
+                # Stops function execution if there is no currency_pair price match
                 if high_ask.price > high_bid.price:
                     break
 

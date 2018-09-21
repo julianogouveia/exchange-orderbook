@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 
 from exchange_core.models import BaseModel
-from exchange_orderbook.choices import SIDE_CHOICES, STATE_CHOICES, CREATED_STATE
+from exchange_orderbook.choices import SIDE_CHOICES, STATE_CHOICES, CREATED_STATE, ASK_SIDE
 
 
 class BaseCurrencies(TimeStampedModel, BaseModel):
@@ -43,7 +43,7 @@ class Orders(TimeStampedModel, BaseModel):
     qty = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'), verbose_name=_("Quantity"))
     fee = models.DecimalField(max_digits=20, decimal_places=8, null=True, verbose_name=_("Fee"))
     fee_currency = models.ForeignKey('exchange_core.Currencies', related_name='orders', on_delete=models.CASCADE, null=True, verbose_name=_("Fee currency"))
-    side = models.CharField(max_length=1, choices=SIDE_CHOICES, verbose_name=_("Side"))
+    side = models.CharField(max_length=3, choices=SIDE_CHOICES, verbose_name=_("Side"))
     state = models.CharField(max_length=30, choices=STATE_CHOICES, default=CREATED_STATE, verbose_name=_("State"))
     executed = models.DateTimeField(null=True, verbose_name=_("Executed"))
 
@@ -51,6 +51,10 @@ class Orders(TimeStampedModel, BaseModel):
         verbose_name = _("Order")
         verbose_name_plural = _("Orders")
         ordering = ['-created']
+
+    @property
+    def side_name(self):
+        return _("Ask") if self.side == ASK_SIDE else _("Bid")
 
     def __str__(self):
         return '{} | {} - {} | {} - {}'.format(self.side, self.price,
