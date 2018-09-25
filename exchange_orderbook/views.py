@@ -28,7 +28,7 @@ class OrdersView(TemplateView):
         for base_currency in BaseCurrencies.objects.order_by('order'):
             context['base_currencies'].append({
                 'pk': base_currency.pk,
-                'symbol': base_currency.currency.code
+                'code': base_currency.currency.code
             })
 
         return context
@@ -39,8 +39,8 @@ class UpdateBaseCurrencyView(View):
     def post(self, request):
         user = request.user
 
-        if BaseCurrencies.objects.filter(currency__code=request.POST['symbol']).exists():
-            code = request.POST['symbol']
+        if BaseCurrencies.objects.filter(currency__code=request.POST['code']).exists():
+            code = request.POST['code']
             user.profile[settings.ORDERBOOK_BASE_CURRENCY_SESSION_NAME] = code
             market_session_name = settings.ORDERBOOK_MARKET_SESSION_NAME + '_' + code
 
@@ -61,7 +61,7 @@ class UpdateBaseCurrencyView(View):
 class UpdateMarketCurrencyView(View):
     def post(self, request):
         user = request.user
-        currency_code = request.POST['symbol']
+        currency_code = request.POST['code']
         base_currency = user.profile[settings.ORDERBOOK_BASE_CURRENCY_SESSION_NAME]
         currency_pair_session = settings.ORDERBOOK_MARKET_SESSION_NAME + '_' + base_currency
         currency_pair = CurrencyPairs.objects.get(base_currency__currency__code=base_currency, quote_currency__code=currency_code)
@@ -186,7 +186,7 @@ class CreateOrderView(View):
 @method_decorator([login_required, json_view], name='dispatch')
 class GetAvailableBalanceView(View):
     def post(self, request):
-        currency = Currencies.objects.get(code=request.POST['symbol'])
+        currency = Currencies.objects.get(code=request.POST['code'])
         account = Accounts.objects.get(user=request.user, currency=currency)
         return {'available_balance': '{:8f}'.format(account.deposit)}
 
@@ -256,6 +256,7 @@ class BaseOrdersView(View):
                 'price': '{:8f}'.format(order.price),
                 'qty_currency': currency_pair.quote_currency.code,
                 'qty': '{:8f}'.format(order.qty),
+                'amount': '{:8f}'.format(round(order.amount, 8)),
                 'is_mine': request.user.pk == order.user.pk
             })
 

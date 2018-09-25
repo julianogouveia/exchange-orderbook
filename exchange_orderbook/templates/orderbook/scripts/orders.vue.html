@@ -49,7 +49,7 @@
 						var vm = this;
 
 						function get_available_balance_1() {
-							$.post('{% url "orderbook>get-available-balance" %}', {symbol: vm.base_currency}, function(response) {
+							$.post('{% url "orderbook>get-available-balance" %}', {code: vm.base_currency}, function(response) {
 								vm.base_currency_balance = parseFloat(response.available_balance).toFixed(8);
 							}).always(function() {
 								setTimeout(function() {
@@ -59,7 +59,7 @@
 						}
 
 						function get_available_balance_2() {
-							$.post('{% url "orderbook>get-available-balance" %}', {symbol: vm.market_currency}, function(response) {
+							$.post('{% url "orderbook>get-available-balance" %}', {code: vm.market_currency}, function(response) {
 								vm.market_currency_balance = parseFloat(response.available_balance).toFixed(8);
 							}).always(function() {
 								setTimeout(function() {
@@ -226,10 +226,10 @@
 					new_s_order_app.market_pk = response.market_pk;
 					new_b_order_app.market_pk = response.market_pk;
 				},
-				set_base_currency: function(symbol) {
+				set_base_currency: function(code) {
 					var vm = this;
 
-					$.post('{% url "orderbook>update-base-currency" %}', {'symbol': symbol}, function(response) {
+					$.post('{% url "orderbook>update-base-currency" %}', {'code': code}, function(response) {
 						vm.base_currency = response.base_currency;
 						new_s_order_app.base_currency = response.base_currency;
 						new_b_order_app.base_currency = response.base_currency;
@@ -237,10 +237,10 @@
 						vm.update_apps(response);
 					});
 				},
-				set_market_currency: function(symbol) {
+				set_market_currency: function(code) {
 					var vm = this;
 
-					$.post('{% url "orderbook>update-market-currency" %}', {'symbol': symbol}, function(response) {
+					$.post('{% url "orderbook>update-market-currency" %}', {'code': code}, function(response) {
 						vm.market_currency = response.market_currency;
 						vm.update_apps(response);
 					});
