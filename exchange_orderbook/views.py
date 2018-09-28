@@ -201,7 +201,7 @@ class CancelMyOrderView(View):
             order.save()
 
             if order.side == ASK_SIDE:
-                account = Accounts.objects.get(user=request.user, currency=order.currency_pair.currency)
+                account = Accounts.objects.get(user=request.user, currency=order.currency_pair.quote_currency)
                 account.reserved -= order.amount
                 account.deposit += order.amount
                 account.save()
