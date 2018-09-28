@@ -97,19 +97,19 @@ class FIFO:
         b_active_account, b_passive_account = self.get_accounts(bid)
         a_active_account, a_passive_account = self.get_accounts(ask)
 
-        if ask.amount < bid.amount:
-            bid_total = ask.amount * ask.price
-            give_back = abs((bid.price * ask.amount) - (ask.price * ask.amount)) if ask.price < bid.price else None
+        if ask.qty < bid.qty:
+            bid_total = ask.qty * ask.price
+            give_back = abs((bid.price * ask.qty) - (ask.price * ask.qty)) if ask.price < bid.price else None
 
-            bid_fee, ask_fee = self.trade(bid, ask, bid_total, ask.amount, a_active_account, b_active_account,
+            bid_fee, ask_fee = self.trade(bid, ask, bid_total, ask.qty, a_active_account, b_active_account,
                                           a_passive_account, b_passive_account, give_back=give_back)
             self.finish_order(ask, ask_fee)
 
             # Take out the amount and save the order
             # for not execute the order with the same amount again
-            original_bid_amount = bid.amount
+            original_bid_amount = bid.qty
             original_bid_price = bid.price
-            bid.amount = ask.amount
+            bid.qty = ask.qty
             bid.save()
 
             self.finish_order(bid, bid_fee)
@@ -118,36 +118,36 @@ class FIFO:
             # Reset object to create a new one
             bid.pk = None
             bid.price = original_bid_price
-            bid.amount = original_bid_amount - ask.amount
+            bid.qty = original_bid_amount - ask.qty
             bid.state = CREATED_STATE
             bid.save()
 
-        elif ask.amount > bid.amount:
-            bid_total = bid.amount * ask.price
-            give_back = abs((bid.price * bid.amount) - (ask.price * bid.amount)) if ask.price < bid.price else None
+        elif ask.qty > bid.qty:
+            bid_total = bid.qty * ask.price
+            give_back = abs((bid.price * bid.qty) - (ask.price * bid.qty)) if ask.price < bid.price else None
 
-            bid_fee, ask_fee = self.trade(bid, ask, bid_total, bid.amount, a_active_account, b_active_account,
+            bid_fee, ask_fee = self.trade(bid, ask, bid_total, bid.qty, a_active_account, b_active_account,
                                           a_passive_account, b_passive_account, give_back=give_back)
             self.finish_order(bid, bid_fee)
 
             # Take out the amount and save the order
             # for not execute the order with the same amount again
-            original_ask_amount = ask.amount
-            ask.amount = bid.amount
+            original_ask_amount = ask.qty
+            ask.qty = bid.qty
             ask.save()
 
             self.finish_order(ask, ask_fee)
 
             # Reset object to create a new one
             ask.pk = None
-            ask.amount = original_ask_amount - bid.amount
+            ask.qty = original_ask_amount - bid.qty
             ask.state = CREATED_STATE
             ask.save()
 
-        elif ask.amount == bid.amount:
-            bid_total = bid.amount * ask.price
-            give_back = abs((bid.price * bid.amount) - (ask.price * bid.amount)) if ask.price < bid.price else None
-            bid_fee, ask_fee = self.trade(bid, ask, bid_total, ask.amount, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=give_back)
+        elif ask.qty == bid.qty:
+            bid_total = bid.qty * ask.price
+            give_back = abs((bid.price * bid.qty) - (ask.price * bid.qty)) if ask.price < bid.price else None
+            bid_fee, ask_fee = self.trade(bid, ask, bid_total, ask.qty, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=give_back)
 
             self.finish_order(ask, ask_fee)
             self.finish_order(bid, bid_fee)
