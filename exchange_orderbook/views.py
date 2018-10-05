@@ -154,13 +154,14 @@ class CreateOrderView(View):
             }
 
             # Armazena os valores que deverao ser comparados com o saldo da conta
-            compare_amounts = {
-                ASK_SIDE: order.amount,
-                BID_SIDE: order.price * order.amount
+            compare_qtys = {
+                ASK_SIDE: order.qty,
+                BID_SIDE: order.amount
             }
 
             # Pega a conta que devera ser usada para comprar o saldo
             compare_account = Accounts.objects.get(user=order.user, currency=compare_currencies[order.side])
+            reserved_qty = compare_qtys[order.side]
 
             # Valida os dados
             if order.price <= Decimal('0.00'):
@@ -168,12 +169,12 @@ class CreateOrderView(View):
             if order.amount <= Decimal('0.00'):
                 return {'error': _("Amount is 0")}
             # Compara o valor da order com o saldo de deposito da conta
-            if compare_amounts[order.side] > compare_account.deposit:
+            if reserved_qty > compare_account.deposit:
                 return {'error': _("You does not have enought balance")}
 
             # Reserva o saldo da order
-            compare_account.deposit -= compare_amounts[order.side]
-            compare_account.reserved += compare_amounts[order.side]
+            compare_account.deposit -= reserved_qty
+            compare_account.reserved += reserved_qty
             compare_account.save()
 
             # Com tudo certo, salva a order no banco
