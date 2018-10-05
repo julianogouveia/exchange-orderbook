@@ -124,7 +124,7 @@ class FIFO:
 
         elif ask.qty > bid.qty:
             bid_total = bid.qty * ask.price
-            give_back = abs((bid.price * bid.qty) - (ask.price * bid.qty)) if ask.price < bid.price else None
+            give_back = abs((bid.amount) - (ask.price * bid.qty)) if ask.price < bid.price else None
 
             bid_fee, ask_fee = self.trade(bid, ask, bid_total, bid.qty, a_active_account, b_active_account,
                                           a_passive_account, b_passive_account, give_back=give_back)
@@ -146,7 +146,7 @@ class FIFO:
 
         elif ask.qty == bid.qty:
             bid_total = bid.qty * ask.price
-            give_back = abs((bid.price * bid.qty) - (ask.price * bid.qty)) if ask.price < bid.price else None
+            give_back = abs((bid.amount) - (ask.price * bid.qty)) if ask.price < bid.price else None
             bid_fee, ask_fee = self.trade(bid, ask, bid_total, ask.qty, a_active_account, b_active_account, a_passive_account, b_passive_account, give_back=give_back)
 
             self.finish_order(ask, ask_fee)

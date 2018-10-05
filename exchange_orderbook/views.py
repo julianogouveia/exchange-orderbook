@@ -166,8 +166,8 @@ class CreateOrderView(View):
             # Valida os dados
             if order.price <= Decimal('0.00'):
                 return {'error': _("Price is 0")}
-            if order.amount <= Decimal('0.00'):
-                return {'error': _("Amount is 0")}
+            if order.qty <= Decimal('0.00'):
+                return {'error': _("Quantity is 0")}
             # Compara o valor da order com o saldo de deposito da conta
             if reserved_qty > compare_account.deposit:
                 return {'error': _("You does not have enought balance")}
@@ -203,8 +203,8 @@ class CancelMyOrderView(View):
 
             if order.side == ASK_SIDE:
                 account = Accounts.objects.get(user=request.user, currency=order.currency_pair.quote_currency)
-                account.reserved -= order.amount
-                account.deposit += order.amount
+                account.reserved -= order.qty
+                account.deposit += order.qty
                 account.save()
             elif order.side == BID_SIDE:
                 account = Accounts.objects.get(user=request.user, currency=order.currency_pair.base_currency.currency)
