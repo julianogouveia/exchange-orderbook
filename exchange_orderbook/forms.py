@@ -23,3 +23,18 @@ class OrderForm(forms.ModelForm):
             raise forms.ValidationError(_("Max price for this market is {}".format(currency_pair.max_price)))
 
         return price
+
+    def clean_qty(self):
+        currency_pair = self.cleaned_data['currency_pair']
+        qty = self.cleaned_data['qty']
+
+        if not isinstance(currency_pair, CurrencyPairs):
+            raise forms.ValidationError(_("Invalid market selected"))
+
+        if currency_pair.min_qty > qty:
+            raise forms.ValidationError(_("Min quantity for this market is {}".format(currency_pair.min_qty)))
+
+        if currency_pair.max_qty < qty:
+            raise forms.ValidationError(_("Max quantity for this market is {}".format(currency_pair.max_qty)))
+
+        return qty
