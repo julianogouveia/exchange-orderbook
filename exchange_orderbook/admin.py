@@ -22,17 +22,21 @@ class TradesAdmin(BaseAdmin):
 
 @admin.register(Orders)
 class OrdersAdmin(BaseAdmin):
-    list_display = ('user', 'currency_pair', 'get_amount', 'get_price', 'fee', 'get_side', 'state', 'type', 'executed', 'created', 'modified',)
+    list_display = ('user', 'currency_pair', 'get_qty', 'get_price', 'get_total', 'fee', 'get_side', 'state', 'type', 'executed', 'created', 'modified',)
     readonly_fields = ('user', 'currency_pair', 'side', 'price', 'qty', 'fee', 'fee_currency', 'state', 'type', 'executed', 'created', 'modified')
     list_select_related = ('currency_pair',)
 
-    def get_amount(self, o):
-        return '{:.8f} {}'.format(o.amount, o.currency_pair.quote_currency.code)
-    get_amount.short_description = _("Amount")
+    def get_qty(self, o):
+        return '{:.8f} {}'.format(o.qty, o.currency_pair.quote_currency.code)
+    get_qty.short_description = _("Quantity")
 
     def get_price(self, o):
         return '{:.8f} {}'.format(o.price, o.currency_pair.base_currency.currency.code)
     get_price.short_description = _("Price")
+
+    def get_total(self, o):
+        return '{:.8f} {}'.format(o.amount, o.currency_pair.quote_currency.code)
+    get_total.short_description = _("Total")
 
     def get_side(self, o):
         return _("Ask") if o.side == ASK_SIDE else _("Bid")
