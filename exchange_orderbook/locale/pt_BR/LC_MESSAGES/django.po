@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-14 13:58-0300\n"
+"POT-Creation-Date: 2018-10-15 00:23-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: jorge ugalde <jorgeac66@gmail.com>, 2018\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/neosacode/"
@@ -27,7 +27,7 @@ msgstr ""
 msgid "Amount"
 msgstr "Quantidade"
 
-#: exchange_orderbook/admin.py:35 exchange_orderbook/models.py:42
+#: exchange_orderbook/admin.py:35 exchange_orderbook/models.py:48
 #: exchange_orderbook/templates/orderbook/orders.html:60
 #: exchange_orderbook/templates/orderbook/orders.html:113
 #: exchange_orderbook/templates/orderbook/orders.html:171
@@ -37,16 +37,16 @@ msgid "Price"
 msgstr "Preço"
 
 #: exchange_orderbook/admin.py:38 exchange_orderbook/choices.py:9
-#: exchange_orderbook/models.py:57
+#: exchange_orderbook/models.py:64
 msgid "Ask"
 msgstr "Venda"
 
 #: exchange_orderbook/admin.py:38 exchange_orderbook/choices.py:8
-#: exchange_orderbook/models.py:57
+#: exchange_orderbook/models.py:64
 msgid "Bid"
 msgstr "Compra"
 
-#: exchange_orderbook/admin.py:39 exchange_orderbook/models.py:46
+#: exchange_orderbook/admin.py:39 exchange_orderbook/models.py:52
 msgid "Side"
 msgstr "Lado"
 
@@ -59,7 +59,7 @@ msgstr "Livro de Ofertas"
 msgid "Created"
 msgstr "Criado"
 
-#: exchange_orderbook/choices.py:19 exchange_orderbook/models.py:48
+#: exchange_orderbook/choices.py:19 exchange_orderbook/models.py:55
 msgid "Executed"
 msgstr "Executado"
 
@@ -67,107 +67,127 @@ msgstr "Executado"
 msgid "Canceled"
 msgstr "Cancelado"
 
-#: exchange_orderbook/forms.py:17 exchange_orderbook/forms.py:32
+#: exchange_orderbook/forms.py:20 exchange_orderbook/forms.py:43
 msgid "Invalid market selected"
 msgstr "Mercado inválido selecionado"
 
-#: exchange_orderbook/forms.py:20
+#: exchange_orderbook/forms.py:25
+msgid "Bid/Ask immediately is not allowed by this moment"
+msgstr "Comprar/Vender imediatamente não é permitido no momento"
+
+#: exchange_orderbook/forms.py:28
+msgid "Price for this market must be greater than 0"
+msgstr "Preço para este mercado deve ser maior que 0"
+
+#: exchange_orderbook/forms.py:31
 msgid "Min price for this market is {}"
 msgstr "Preço mínimo para este mercado é {}"
 
-#: exchange_orderbook/forms.py:23
+#: exchange_orderbook/forms.py:34
 msgid "Max price for this market is {}"
 msgstr "Preço máximo para este mercado é {}"
 
-#: exchange_orderbook/forms.py:35
-#| msgid "Min price for this market is {}"
+#: exchange_orderbook/forms.py:46
+msgid "Quantity for this market must be greater than 0"
+msgstr "Quantidade para este mercado deve ser maior que 0"
+
+#: exchange_orderbook/forms.py:49
 msgid "Min quantity for this market is {}"
 msgstr "Quantidade mínima para este mercado é {}"
 
-#: exchange_orderbook/forms.py:38
-#| msgid "Max price for this market is {}"
+#: exchange_orderbook/forms.py:52
 msgid "Max quantity for this market is {}"
 msgstr "Quantidade máxima para este mercado é {}"
 
-#: exchange_orderbook/models.py:12
+#: exchange_orderbook/models.py:13
 msgid "Currency"
 msgstr "Moeda"
 
-#: exchange_orderbook/models.py:13 exchange_orderbook/models.py:51
-#, fuzzy
-#| msgid "Orderbook"
+#: exchange_orderbook/models.py:14 exchange_orderbook/models.py:58
 msgid "Order"
-msgstr "Livro de Ofertas"
+msgstr "Ordem"
 
-#: exchange_orderbook/models.py:13
+#: exchange_orderbook/models.py:14
 msgid "The order who base currency must appears in Orderbook"
 msgstr "A ordem na qual a moeda base deve aparecer no Livro de Ofertas"
 
-#: exchange_orderbook/models.py:19 exchange_orderbook/models.py:24
+#: exchange_orderbook/models.py:20 exchange_orderbook/models.py:25
 msgid "Base currency"
 msgstr "Moeda Base"
 
-#: exchange_orderbook/models.py:20
+#: exchange_orderbook/models.py:21
 msgid "Base currencies"
 msgstr "Moedas base"
 
-#: exchange_orderbook/models.py:25
+#: exchange_orderbook/models.py:26
 msgid "Quote currency"
 msgstr "Moeda de cotação"
 
-#: exchange_orderbook/models.py:26
+#: exchange_orderbook/models.py:27
 msgid "Min price"
 msgstr "Preço mínimo"
 
-#: exchange_orderbook/models.py:27
+#: exchange_orderbook/models.py:28
 msgid "Max price"
 msgstr "Preço máximo"
 
-#: exchange_orderbook/models.py:28
+#: exchange_orderbook/models.py:29
 msgid "Min quantity"
 msgstr "Quantidade mínima"
 
-#: exchange_orderbook/models.py:29
+#: exchange_orderbook/models.py:30
 msgid "Max quantity"
 msgstr "Quantidade máxima"
 
-#: exchange_orderbook/models.py:35 exchange_orderbook/models.py:40
+#: exchange_orderbook/models.py:36 exchange_orderbook/models.py:46
 msgid "Currency pair"
 msgstr "Par de moeda"
 
-#: exchange_orderbook/models.py:36
+#: exchange_orderbook/models.py:37
 msgid "Currency pairs"
 msgstr "Pares de moeda"
 
-#: exchange_orderbook/models.py:41
+#: exchange_orderbook/models.py:42
+msgid "Bid/Ask"
+msgstr "Comprar/Vender"
+
+#: exchange_orderbook/models.py:43
+msgid "To market"
+msgstr "A mercado"
+
+#: exchange_orderbook/models.py:47
 msgid "User"
 msgstr "Usuário"
 
-#: exchange_orderbook/models.py:43
+#: exchange_orderbook/models.py:49
 msgid "Quantity"
 msgstr "Quantidade"
 
-#: exchange_orderbook/models.py:44
+#: exchange_orderbook/models.py:50
 msgid "Fee"
 msgstr "Taxa"
 
-#: exchange_orderbook/models.py:45
+#: exchange_orderbook/models.py:51
 msgid "Fee currency"
 msgstr "Moeda taxada"
 
-#: exchange_orderbook/models.py:47
+#: exchange_orderbook/models.py:53
 msgid "State"
 msgstr "Estado"
 
-#: exchange_orderbook/models.py:52
+#: exchange_orderbook/models.py:54
+msgid "Type"
+msgstr "Tipo"
+
+#: exchange_orderbook/models.py:59
 msgid "Orders"
 msgstr "Ordens"
 
-#: exchange_orderbook/models.py:76
+#: exchange_orderbook/models.py:83
 msgid "Trade"
 msgstr "Trade"
 
-#: exchange_orderbook/models.py:77
+#: exchange_orderbook/models.py:84
 msgid "Trades"
 msgstr "Trades"
 
@@ -215,19 +235,19 @@ msgstr "Mercado"
 
 #: exchange_orderbook/templates/orderbook/orders.html:169
 msgid "Coin"
-msgstr ""
+msgstr "Moeda"
 
 #: exchange_orderbook/templates/orderbook/orders.html:170
 msgid "Code"
-msgstr ""
+msgstr "Código"
 
 #: exchange_orderbook/templates/orderbook/orders.html:172
 msgid "Volume"
-msgstr ""
+msgstr "Volume"
 
 #: exchange_orderbook/templates/orderbook/orders.html:188
 msgid "Market trade chart"
-msgstr ""
+msgstr "Gráfico trader"
 
 #: exchange_orderbook/templates/orderbook/orders.html:198
 msgid "Sell Orders"
@@ -243,7 +263,7 @@ msgstr "Ordens de venda"
 #: exchange_orderbook/templates/orderbook/orders.html:228
 #: exchange_orderbook/templates/orderbook/orders.html:270
 msgid "Cancel my order"
-msgstr ""
+msgstr "Cancelar minha ordem"
 
 #: exchange_orderbook/templates/orderbook/orders.html:240
 msgid "Buy Orders"
@@ -253,20 +273,20 @@ msgstr "Ordens de Compra"
 msgid "Orders History"
 msgstr "Histórico de Ordens"
 
-#: exchange_orderbook/templates/orderbook/scripts/orders.vue.html:35
+#: exchange_orderbook/templates/orderbook/scripts/orders.vue.html:37
 msgid "Success!"
 msgstr "Sucesso!"
 
-#: exchange_orderbook/templates/orderbook/scripts/orders.vue.html:35
+#: exchange_orderbook/templates/orderbook/scripts/orders.vue.html:37
 msgid "Your order has been created."
 msgstr "Sua ordem foi criada."
 
-#: exchange_orderbook/templates/orderbook/scripts/orders.vue.html:41
+#: exchange_orderbook/templates/orderbook/scripts/orders.vue.html:43
 msgid "Error"
 msgstr "Erro"
 
-#: exchange_orderbook/templates/orderbook/scripts/orders.vue.html:124
-#: exchange_orderbook/templates/orderbook/scripts/orders.vue.html:163
+#: exchange_orderbook/templates/orderbook/scripts/orders.vue.html:126
+#: exchange_orderbook/templates/orderbook/scripts/orders.vue.html:165
 msgid "Are you sure you want delete this order?"
 msgstr "Você tem certeza que deseja deletar esta operação?"
 
@@ -315,32 +335,16 @@ msgid "Tooltip text"
 msgstr ""
 
 #: exchange_orderbook/views.py:168
-msgid "Price is 0"
-msgstr "O Preço é 0"
-
-#: exchange_orderbook/views.py:170
-#, fuzzy
-#| msgid "Quantity"
-msgid "Quantity is 0"
-msgstr "Quantidade"
-
-#: exchange_orderbook/views.py:173
 msgid "You does not have enought balance"
 msgstr "Você não tem Saldo"
 
-#: exchange_orderbook/views.py:215
-#, fuzzy
-#| msgid "Your order has been created."
+#: exchange_orderbook/views.py:210
 msgid "Your order has been canceled"
 msgstr "Sua ordem foi criada."
 
-#, fuzzy
-#~| msgid "amount is 0"
-#~ msgid "Amount is 0"
-#~ msgstr "A quantidade é 0"
+#~ msgid "Price is 0"
+#~ msgstr "O Preço é 0"
 
-#~ msgid "Pair"
-#~ msgstr "Par"
-
-#~ msgid "Pairs"
-#~ msgstr "Pares"
+#~| msgid "Quantity"
+#~ msgid "Quantity is 0"
+#~ msgstr "Quantidade"

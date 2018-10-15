@@ -3,6 +3,7 @@ from decimal import Decimal
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
+from extended_choices import Choices
 
 from exchange_core.models import BaseModel
 from exchange_orderbook.choices import SIDE_CHOICES, STATE_CHOICES, CREATED_STATE, ASK_SIDE
@@ -37,6 +38,11 @@ class CurrencyPairs(TimeStampedModel, BaseModel):
 
 
 class Orders(TimeStampedModel, BaseModel):
+    TYPES = Choices(
+        ('bid_ask', 'bid_ask', _("Bid/Ask")),
+        ('market', 'market', _("To market"))
+    )
+
     currency_pair = models.ForeignKey(CurrencyPairs, related_name='orders', on_delete=models.CASCADE, verbose_name=_("Currency pair"))
     user = models.ForeignKey('exchange_core.Users', related_name='orders', on_delete=models.CASCADE, verbose_name=_("User"))
     price = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal('0.00'), verbose_name=_("Price"))
@@ -45,6 +51,7 @@ class Orders(TimeStampedModel, BaseModel):
     fee_currency = models.ForeignKey('exchange_core.Currencies', related_name='orders', on_delete=models.CASCADE, null=True, verbose_name=_("Fee currency"))
     side = models.CharField(max_length=3, choices=SIDE_CHOICES, verbose_name=_("Side"))
     state = models.CharField(max_length=30, choices=STATE_CHOICES, default=CREATED_STATE, verbose_name=_("State"))
+    type = models.CharField(max_length=30, choices=TYPES, default=TYPES.bid_ask, verbose_name=_("Type"))
     executed = models.DateTimeField(null=True, verbose_name=_("Executed"))
 
     class Meta:

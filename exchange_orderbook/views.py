@@ -163,11 +163,6 @@ class CreateOrderView(View):
             compare_account = Accounts.objects.get(user=order.user, currency=compare_currencies[order.side])
             reserved_qty = compare_qtys[order.side]
 
-            # Valida os dados
-            if order.price <= Decimal('0.00'):
-                return {'error': _("Price is 0")}
-            if order.qty <= Decimal('0.00'):
-                return {'error': _("Quantity is 0")}
             # Compara o valor da order com o saldo de deposito da conta
             if reserved_qty > compare_account.deposit:
                 return {'error': _("You does not have enought balance")}
@@ -179,6 +174,11 @@ class CreateOrderView(View):
 
             # Com tudo certo, salva a order no banco
             order.fee_currency = compare_account.currency
+
+            # Sets order type to market when needed
+            if order_form.cleaned_data['is_market']:
+                order.type = Orders.TYPES.market
+
             order.save()
 
             return {'order': order.pk}

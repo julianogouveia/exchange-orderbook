@@ -13,6 +13,7 @@
 					market_pk: null,
 					base_currency_balance: 0,
 					market_currency_balance: 0,
+                    is_market_order: false,
 					errors: {}
 				},
 				methods: {
@@ -23,8 +24,13 @@
 							price: this.price,
 							qty: this.qty,
 							currency_pair: this.market_pk,
-							side: type
+							side: type,
+                            is_market: this.is_market_order ? 1 : 0
 						};
+
+						if (data.is_market) {
+						    data.price = 0;
+                        }
 
 						var vm = this;
 
