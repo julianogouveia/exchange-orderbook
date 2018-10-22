@@ -220,7 +220,7 @@
                                     <th class="text-right"><i class="zmdi zmdi-chart"></i> {% trans "Total" %}</th>
                                 </tr>
                             </thead>
-                            <tbody class="text-right">
+                            <tbody class="text-right tx-12">
                                 <tr v-for="item in orders" @click.prevent="populate_order(item)">
                                     <td v-text="item.price + ' - ' + item.price_currency"></td>
                                     <td v-text="item.qty + ' - ' + item.qty_currency"></td>
@@ -258,7 +258,7 @@
                                     <th class="text-right"><i class="zmdi zmdi-chart"></i> {% trans "Total" %}</th>
                                 </tr>
                             </thead>
-                            <tbody class="text-right">
+                            <tbody class="text-right tx-12">
                                 <tr v-for="item in orders" @click.prevent="populate_order(item)">
                                     <td v-text="item.price + ' - ' + item.price_currency"></td>
                                     <td v-text="item.qty + ' - ' + item.qty_currency"></td>
@@ -292,7 +292,7 @@
                                 <th class="text-right"><i class="zmdi zmdi-chart"></i> Total</th>
                             </tr>
                         </thead>
-                        <tbody class="text-right">
+                        <tbody class="text-right tx-12">
                             <tr v-for="item in orders">
                                 <td v-text="item.updated"></td>
                                 <td v-text="item.side"></td>
