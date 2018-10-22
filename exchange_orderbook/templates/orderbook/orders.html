@@ -197,7 +197,7 @@
 
             <div class="row m-t-30">
                 <div class="col-md-6">
-                    <div class="card-box" id="sell-orders-app">
+                    <div id="sell-orders-app">
                         <div class="row">
                             <div class="col-sm-12">
                                 <h5 class="text-uppercase">
@@ -233,7 +233,7 @@
                 </div>
 
                 <div class="col-md-6">
-                    <div class="card-box" id="buy-orders-app">
+                    <div id="buy-orders-app">
                         <div class="row">
                             <div class="col-sm-12">
                                 <h5 class="text-uppercase">
@@ -261,7 +261,7 @@
                                     <td v-text="item.price + ' - ' + item.price_currency"></td>
                                     <td v-text="item.qty + ' - ' + item.qty_currency"></td>
                                     <td v-text="item.qty + ' - ' + item.price_currency"></td>
-                                    <td :class="{'show-star': item.is_mine}"><i class="fa fa-star"></i> <a href="#" @click.prevent="cancel_order(item.pk)" class="btn btn-xs btn-danger" title="{% trans "Cancel my order" %}"><strong>&times;</strong></a></td>
+                                    <td :class="{'show-star': item.is_mine}"><i class="fa fa-star"></i> <a href="#" @click.prevent="cancel_order(item.pk)" class="btn btn-xs tx-11 rounded-0 btn-danger" title="{% trans "Cancel my order" %}"><strong>&times;</strong></a></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -271,7 +271,7 @@
 
         <div class="row m-t-30">
             <div class="col-md-12">
-                <div class="card-box" id="executed-orders-app">
+                <div id="executed-orders-app">
                     <div class="row">
                         <div class="col-sm-12">
                             <h5 class="text-uppercase"><i class="zmdi zmdi-time-restore"></i> {% trans "Orders History" %}</h5>
