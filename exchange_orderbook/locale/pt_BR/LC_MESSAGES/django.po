@@ -254,10 +254,9 @@ msgstr "Ordens de venda"
 
 #: exchange_orderbook/templates/orderbook/orders.html:202
 #: exchange_orderbook/templates/orderbook/orders.html:244
-#, fuzzy
 #| msgid "Sell Orders"
 msgid "See only my orders"
-msgstr "Ordens de venda"
+msgstr "Ver apenas minhas ordens"
 
 #: exchange_orderbook/templates/orderbook/orders.html:228
 #: exchange_orderbook/templates/orderbook/orders.html:270

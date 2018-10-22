@@ -59,7 +59,7 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-sm-7">
-                                            <h6 class="mg-b-0 box-shadow tx-roboto tx-black"><i class="zmdi zmdi-chevron-down"></i> <span v-text="'{% trans "Buy" %} ' + base_currency"></h6>
+                                            <h6 class="mg-b-0 box-shadow tx-roboto tx-black"><i class="zmdi zmdi-chevron-down"></i> <span v-text="'{% trans "Buy" %} ' + market_currency"></h6>
                                             <p class="tx-12 mg-b-5">{% trans "Start buy here" %}</p>
                                         </div>
                                         <div class="col-sm-5">
@@ -112,7 +112,7 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-sm-7">
-                                            <h6 class="mg-b-0 box-shadow tx-roboto tx-black"><i class="zmdi zmdi-chevron-up"></i> <span v-text="'{% trans "Sell" %} ' + base_currency"></span></h6>
+                                            <h6 class="mg-b-0 box-shadow tx-roboto tx-black"><i class="zmdi zmdi-chevron-up"></i> <span v-text="'{% trans "Sell" %} ' + market_currency"></span></h6>
                                             <p class="tx-12 mg-b-5">{% trans "Start sell here" %}</p>
                                         </div>
                                         <div class="col-sm-5">
@@ -169,7 +169,7 @@
                             <h5 class="tx-roboto tx-black text-uppercase mt-4"><i class="zmdi zmdi-chart"></i> {% trans "Markets" %}</h5>
                         </div>
                         <div class="col-sm-4">
-                        	<div class="btn-group btn-group-sm pull-right" role="group">
+                        	<div class="btn-group btn-group-sm pull-right mt-4">
                               <button type="button" v-for="item in base_currencies" :class="{'btn': true, 'btn-dark active': item.code == base_currency, 'btn-primary': item.code != base_currency}" @click.prevent="set_base_currency(item.code)" v-text="item.code"></button>
 							</div>
                         </div>
