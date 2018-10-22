@@ -225,7 +225,7 @@
                                     <td v-text="item.price + ' - ' + item.price_currency"></td>
                                     <td v-text="item.qty + ' - ' + item.qty_currency"></td>
                                     <td v-text="item.qty + ' - ' + item.price_currency"></td>
-                                    <td :class="{'show-star': item.is_mine}"><i class="fa fa-star"></i> <a href="#" @click.prevent="cancel_order(item.pk)" class="btn btn-xs btn-danger" title="{% trans "Cancel my order" %}"><strong>&times;</strong></a></td>
+                                    <td :class="{'show-star': item.is_mine}"><i class="fa fa-star"></i> <a href="#" @click.prevent="cancel_order(item.pk)" class="btn btn-xs rounded-0 btn-danger tx-11" title="{% trans "Cancel my order" %}"><strong>&times;</strong></a></td>
                                 </tr>
                             </tbody>
                         </table>
