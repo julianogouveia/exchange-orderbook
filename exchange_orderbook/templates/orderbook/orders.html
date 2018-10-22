@@ -217,15 +217,17 @@
                                 <tr class="tx-11 text-uppercase">
                                     <th class="text-right"><i class="zmdi zmdi-balance"></i> {% trans "Price" %}</th>
                                     <th class="text-right"><i class="zmdi zmdi-money"></i> {% trans "Amount" %}</th>
-                                    <th class="text-right" colspan="2"><i class="zmdi zmdi-chart"></i> {% trans "Total" %}</th>
+                                    <th class="text-right"><i class="zmdi zmdi-chart"></i> {% trans "Total" %}</th>
                                 </tr>
                             </thead>
                             <tbody class="text-right">
                                 <tr v-for="item in orders" @click.prevent="populate_order(item)">
                                     <td v-text="item.price + ' - ' + item.price_currency"></td>
                                     <td v-text="item.qty + ' - ' + item.qty_currency"></td>
-                                    <td v-text="item.amount"></td>
-                                    <td width="10" :class="{'show-star': item.is_mine}"><i class="fa fa-star"></i> <a href="#" @click.prevent="cancel_order(item.pk)" class="btn btn-xs rounded-0 btn-danger tx-11" title="{% trans "Cancel my order" %}"><strong>&times;</strong></a></td>
+                                    <td>
+                                        <span v-text="item.amount"></span>
+                                        <i class="fa fa-star" v-show="item.is_mine"></i> <a href="#" v-show="item.is_mine" @click.prevent="cancel_order(item.pk)" class="btn btn-xs tx-11 rounded-0 btn-danger" title="{% trans "Cancel my order" %}"><strong>&times;</strong></a>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -253,15 +255,17 @@
                                 <tr class="tx-11 text-uppercase">
                                     <th class="text-right"><i class="zmdi zmdi-balance"></i> {% trans "Price" %}</th>
                                     <th class="text-right"><i class="zmdi zmdi-money"></i> {% trans "Amount" %}</th>
-                                    <th class="text-right" colspan="2"><i class="zmdi zmdi-chart"></i> {% trans "Total" %}</th>
+                                    <th class="text-right"><i class="zmdi zmdi-chart"></i> {% trans "Total" %}</th>
                                 </tr>
                             </thead>
                             <tbody class="text-right">
                                 <tr v-for="item in orders" @click.prevent="populate_order(item)">
                                     <td v-text="item.price + ' - ' + item.price_currency"></td>
                                     <td v-text="item.qty + ' - ' + item.qty_currency"></td>
-                                    <td v-text="item.amount"></td>
-                                    <td width="10" :class="{'show-star': item.is_mine}"><i class="fa fa-star"></i> <a href="#" @click.prevent="cancel_order(item.pk)" class="btn btn-xs tx-11 rounded-0 btn-danger" title="{% trans "Cancel my order" %}"><strong>&times;</strong></a></td>
+                                    <td>
+                                        <span v-text="item.amount"></span>
+                                        <i class="fa fa-star" v-show="item.is_mine"></i> <a href="#" v-show="item.is_mine" @click.prevent="cancel_order(item.pk)" class="btn btn-xs tx-11 rounded-0 btn-danger" title="{% trans "Cancel my order" %}"><strong>&times;</strong></a>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -285,7 +289,7 @@
                                 <th class="text-right"><i class="zmdi zmdi-label-alt"></i> Type</th>
                                 <th class="text-right"><i class="zmdi zmdi-balance"></i> Price</th>
                                 <th class="text-right"><i class="zmdi zmdi-money"></i> Amount</th>
-                                <th class="text-right"><i class="zmdi zmdi-chart" colspan="2"></i> Total</th>
+                                <th class="text-right"><i class="zmdi zmdi-chart"></i> Total</th>
                             </tr>
                         </thead>
                         <tbody class="text-right">
@@ -294,8 +298,10 @@
                                 <td v-text="item.side"></td>
                                 <td v-text="item.price"></td>
                                 <td v-text="item.qty"></td>
-                                <td v-text="item.qty"></td>
-                                <td width="10" :class="{'show-star': item.is_mine}"><i class="fa fa-star"></i></td>
+                                <td>
+                                    <span v-text="item.amount"></span>
+                                    <i class="fa fa-star" v-show="item.is_mine"></i>
+                                </td>
                             </tr>
                         </tbody>
                 </table>
