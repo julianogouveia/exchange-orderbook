@@ -35,6 +35,10 @@
             position: relative;
             top: 2px;
         }
+
+        #widget-container {
+            background-color: transparent !important;
+        }
 	</style>
 {% endblock %}
 
@@ -313,4 +317,10 @@
 
 {% block scripts %}
     {% include "orderbook/scripts/orders.vue.html" with base_currencies=base_currencies %}
+    <script>
+      waitForEl('#tradingview_20155 iframe', function(el) {
+          console.log(el.contents().find('#widget-container'));
+        el.contents().find('#widget-container').css('background-color', 'transparent');
+      });
+    </script>
 {% endblock %}
