@@ -20,8 +20,8 @@ settings.INTERMEDIATION_ACTIVE_FEE = config('INTERMEDIATION_ACTIVE_FEE', default
 
 # Orders listing config
 settings.ORDERBOOK_TABLE_LIMIT = config('ORDERBOOK_TABLE_LIMIT', default=50)
-settings.STOCK_CHART_THEME = config('STOCK_CHART_THEME', default='light')
-settings.STOCK_CHART_HEIGHT = config('STOCK_CHART_HEIGHT', default=400, cast=int)
+settings.TRADINGVIEW_THEME = config('TRADINGVIEW_THEME', default='light')
+settings.TRADINGVIEW_HEIGHT = config('TRADINGVIEW_HEIGHT', default=500, cast=int)
 
 #
 settings.ALLOW_SAME_USER_ORDER_MATCH = config('ALLOW_SAME_USER_ORDER_MATCH', default=False, cast=config.boolean)

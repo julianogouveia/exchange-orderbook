@@ -53,7 +53,7 @@ msgstr "Lado"
 #: exchange_orderbook/apps.py:7
 #: exchange_orderbook/templates/orderbook/orders.html:35
 msgid "Orderbook"
-msgstr "Livro de Ofertas"
+msgstr "Comprar/Vender"
 
 #: exchange_orderbook/choices.py:18
 msgid "Created"
@@ -228,10 +228,9 @@ msgid "Start sell here"
 msgstr "Comece a vender aqui"
 
 #: exchange_orderbook/templates/orderbook/orders.html:158
-#, fuzzy
 #| msgid "Market"
 msgid "Markets"
-msgstr "Mercado"
+msgstr "Mercados"
 
 #: exchange_orderbook/templates/orderbook/orders.html:169
 msgid "Coin"

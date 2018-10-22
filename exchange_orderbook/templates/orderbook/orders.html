@@ -4,6 +4,10 @@
 
 {% block head %}
 	<style>
+        .tx-11 {
+			font-size: 11px;
+		}
+
 		.tx-12 {
 			font-size: 12px;
 		}
@@ -26,19 +30,26 @@
         .btn-xs {
             padding: 0 5px;
         }
-	</style>
 
-    {% include "orderbook/styles/stock-chart.html" %}
+        .fix-checkbox-position {
+            position: relative;
+            top: 2px;
+        }
+	</style>
 {% endblock %}
 
 {% block content %}
 	<h2 class="page-title"><i class="zmdi zmdi-assignment"></i> {% trans "Orderbook" %}</h2>
 
 	<div class="card-box">
+        <h5 class="m-b-20 text-uppercase"><i class="zmdi zmdi-chart"></i> {% trans "Market trade chart" %}</h5>
+
+        {% include "orderbook/stock-chart.html" %}
+
 		<div class="row">
                 <div class="col-md-8">
-                    <div id="orderbook-header" class="m-b-20">
-                        <h2 v-text="exchange_name + ' {% trans "Exchange" %}'"></h2>
+                    <div id="orderbook-header" class="mt-4 m-b-20">
+                        <h5 class="text-uppercase"><i class="fa fa-exchange"></i> <span v-text="exchange_name + ' {% trans "Exchange" %}'"></span></h5>
                         <h6 v-text="pair"></h6>
                     </div>
 
@@ -155,7 +166,7 @@
                 <div class="col-md-4" id="markets-app">
                 	<div class="row">
                         <div class="col-sm-8">
-                            <h2 class="tx-roboto tx-black"><i class="zmdi zmdi-chart"></i> {% trans "Markets" %}</h2>
+                            <h5 class="tx-roboto tx-black text-uppercase mt-4"><i class="zmdi zmdi-chart"></i> {% trans "Markets" %}</h5>
                         </div>
                         <div class="col-sm-4">
                         	<div class="btn-group btn-group-sm pull-right" role="group">
@@ -163,9 +174,9 @@
 							</div>
                         </div>
                     </div>
-                    <table class="table table-sm table-striped table-hover tx-12 m-t-10">
+                    <table class="table table-sm table-striped table-bordered table-hover tx-12 m-t-10">
                         <thead>
-                            <tr>
+                            <tr class="text-uppercase tx-11">
                                 <th class="text-right"><i class="zmdi zmdi-label-alt"></i> {% trans "Coin" %}</th>
                                 <th class="text-right"><i class="zmdi zmdi-label-alt"></i> {% trans "Code" %}</th>
                                 <th class="text-right"><i class="zmdi zmdi-money"></i> {% trans "Price" %}</th>
@@ -184,40 +195,29 @@
                 </div>
             </div>
 
-            <div class="card-box m-t-20">
-                <h5 class="m-b-20"><i class="zmdi zmdi-chart"></i> {% trans "Market trade chart" %}</h5>
-                {% include "orderbook/stock-chart.html" %}
-            </div>
-
             <div class="row m-t-30">
                 <div class="col-md-6">
                     <div class="card-box" id="sell-orders-app">
                         <div class="row">
                             <div class="col-sm-12">
-                                <h5>
+                                <h5 class="text-uppercase">
                                     <i class="zmdi zmdi-chevron-up"></i> {% trans "Sell Orders" %}
                                     <div class="custom-control custom-checkbox pull-right">
-                                        <label for="myorder-sell" style="font-size: 14px;">
-                                            <input type="checkbox" id="myorder-sell" v-model="only_my_orders">
+                                        <label for="myorder-sell" class="tx-12 text-uppercase">
+                                            <input type="checkbox" class="fix-checkbox-position" id="myorder-sell" v-model="only_my_orders">
                                             {% trans "See only my orders" %}
                                         </label>
                                     </div>
                                 </h5>
                             </div>
                         </div>
-                        <hr>
-                        <table class="bd table table-sm table-striped table-hover tx-12 tx-roboto tx-gray-900">
+
+                        <table class="bd table table-sm table-striped table-hover table-bordered mt-3">
                             <thead>
-                                <tr role="row">
-                                    <th class="text-right">
-                                        <i class="zmdi zmdi-balance"></i> {% trans "Price" %}
-                                    </th>
-                                    <th class="text-right">
-                                        <i class="zmdi zmdi-money"></i> {% trans "Amount" %}
-                                    </th>
-                                    <th class="text-right">
-                                        <i class="zmdi zmdi-chart"></i> {% trans "Total" %}</th>
-                                    <th></th>
+                                <tr class="tx-11 text-uppercase">
+                                    <th class="text-right"><i class="zmdi zmdi-balance"></i> {% trans "Price" %}</th>
+                                    <th class="text-right"><i class="zmdi zmdi-money"></i> {% trans "Amount" %}</th>
+                                    <th class="text-right" colspan="2"><i class="zmdi zmdi-chart"></i> {% trans "Total" %}</th>
                                 </tr>
                             </thead>
                             <tbody class="text-right">
@@ -236,30 +236,24 @@
                     <div class="card-box" id="buy-orders-app">
                         <div class="row">
                             <div class="col-sm-12">
-                                <h5>
+                                <h5 class="text-uppercase">
                                     <i class="zmdi zmdi-chevron-down"></i> {% trans "Buy Orders" %}
                                     <div class="custom-control custom-checkbox pull-right">
-                                        <label for="myorder-buy" style="font-size: 14px;">
-                                            <input type="checkbox" id="myorder-buy" v-model="only_my_orders">
+                                        <label for="myorder-buy" class="tx-12 text-uppercase">
+                                            <input type="checkbox" class="fix-checkbox-position" id="myorder-buy" v-model="only_my_orders">
                                             {% trans "See only my orders" %}
                                         </label>
                                     </div>
                                 </h5>
                             </div>
                         </div>
-                        <hr>
-                        <table class="bd table table-sm table-striped table-hover tx-12 tx-roboto tx-gray-900">
+
+                        <table class="bd table table-sm table-striped table-hover table-bordered mt-3">
                             <thead>
-                                <tr role="row">
-                                    <th class="text-right">
-                                        <i class="zmdi zmdi-balance"></i> {% trans "Price" %}
-                                    </th>
-                                    <th class="text-right">
-                                        <i class="zmdi zmdi-money"></i> {% trans "Amount" %}
-                                    </th>
-                                    <th class="text-right">
-                                        <i class="zmdi zmdi-chart"></i> {% trans "Total" %}</th>
-                                    <th></th>
+                                <tr class="tx-11 text-uppercase">
+                                    <th class="text-right"><i class="zmdi zmdi-balance"></i> {% trans "Price" %}</th>
+                                    <th class="text-right"><i class="zmdi zmdi-money"></i> {% trans "Amount" %}</th>
+                                    <th class="text-right" colspan="2"><i class="zmdi zmdi-chart"></i> {% trans "Total" %}</th>
                                 </tr>
                             </thead>
                             <tbody class="text-right">
@@ -280,14 +274,19 @@
                 <div class="card-box" id="executed-orders-app">
                     <div class="row">
                         <div class="col-sm-12">
-                            <h5><i class="zmdi zmdi-time-restore"></i> {% trans "Orders History" %}</h5>
+                            <h5 class="text-uppercase"><i class="zmdi zmdi-time-restore"></i> {% trans "Orders History" %}</h5>
                         </div>
                     </div>
-                    <hr>
-                    <table class="bd table table-sm table-striped table-hover tx-12 tx-roboto tx-gray-900">
-                        <thead>
-                            <tr role="row"><th class="text-right" rowspan="1" colspan="1" style="width: 426px;"><i class="zmdi zmdi-calendar"></i> Date</th><th class="text-right" rowspan="1" colspan="1" style="width: 118px;"><i class="zmdi zmdi-label-alt"></i> Type</th><th class="text-right" rowspan="1" colspan="1" style="width: 261px;"><i class="zmdi zmdi-balance"></i> Price (BTC)</th><th class="text-right" rowspan="1" colspan="1" style="width: 360px;"><i class="zmdi zmdi-money"></i> Amount (BTS)</th><th class="text-right" rowspan="1" colspan="1" style="width: 264px;"><i class="zmdi zmdi-chart"></i> Total (BTC)</th>
-                                <th></th></tr>
+
+                    <table class="bd table table-sm table-striped table-hover table-bordered mt-3">
+                        <thead class="text-uppercase tx-11">
+                            <tr>
+                                <th class="text-right"><i class="zmdi zmdi-calendar"></i> Date</th>
+                                <th class="text-right"><i class="zmdi zmdi-label-alt"></i> Type</th>
+                                <th class="text-right"><i class="zmdi zmdi-balance"></i> Price</th>
+                                <th class="text-right"><i class="zmdi zmdi-money"></i> Amount</th>
+                                <th class="text-right"><i class="zmdi zmdi-chart" colspan="2"></i> Total</th>
+                            </tr>
                         </thead>
                         <tbody class="text-right">
                             <tr v-for="item in orders">
@@ -307,6 +306,5 @@
 {% endblock %}
 
 {% block scripts %}
-    {% include "orderbook/scripts/stock-chart.html" %}
     {% include "orderbook/scripts/orders.vue.html" with base_currencies=base_currencies %}
 {% endblock %}
